@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Graphic data</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <style> </style>
+		    <script src="http://code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
+	<link href="CSS/bootstrap.min.css" rel="stylesheet">
+
+	     <!-- Latest compiled and minified JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+   
+   	  <!-- jqplot, to mae plots and graphs -->
+	  <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js"></script>
+	  <script language="javascript" type="text/javascript" src="js\jqplot\excanvas.js"></script>
+	  <script language="javascript" type="text/javascript" src="js\jqplot\jqplot.barRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js\jqplot\jqplot.categoryAxisRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js\jqplot\jqplot.pieRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js\jqplot\jqplot.pointLabels.js"></script>
+	  <script language="javascript" type="text/javascript" src="js\jqplot\jqplot.canvasAxisTickRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js\jqplot\jqplot.canvasTextRenderer.js"></script>
+		
+		
+		<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+</head>
+<body style= "padding:10px">
+
+<div id="grafico" style="height:600px;width:600px; display: none;"></div>
+
+
+
+    <script type="text/javascript">
+var valores;
+var timeopen = getParameter('timeopen');  //recibimos el tiempo pasado como entrada
+var timefinish = getParameter('timefinish');  //recibimos el tiempo pasado como entrada
+
+			//función que devuelve el parametro pasado por la url desde el objeto padre
+			function getParameter(parameter){
+			
+                  // Obtiene la cadena completa de URL
+                  var url = location.href;
+                  /* Obtiene la posicion donde se encuentra el signo ?, ahi es donde empiezan los parametros */
+                  var index = url.indexOf("?");
+                  /* Obtiene la posicion donde termina el nombre del parametro e inicia el signo = */
+                  index = url.indexOf(parameter,index) + parameter.length;
+                  /* Verifica que efectivamente el valor en la posicion actuales el signo = */
+                  if (url.charAt(index) == "="){
+                  // Obtiene el valor del parametro
+                  var result = url.indexOf("&",index);
+                  if (result == -1){result=url.length;};
+                  // Despliega el valor del parametro
+                  var resultado = url.substring(index + 1,result);
+				  return resultado;
+                  //alert(resultado);
+                  }
+
+            } 
+
+	
+Array.prototype.contains = function(elem)
+{
+for (var i in this)
+{
+if (this[i] == elem) return true;
+}
+return false;
+}
+	
+			
+
+	function statistics2(valores){ 
+	
+	
+	$("#grafico").show(); //hacemos visible el grafico
+	
+	    var nombres = []; //Array para guardar los nombres de las maquinas
+		var s1 = [];  //Array para guardar los valores del grafico
+		var ticks = [];  //Array para guardar los nombres
+		
+		for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+            var nombre = valores[i]["sn"];
+			
+			//comprobamos si el nombre existe y si no lo guardamos, para obtener un array con los nombres sin repetir
+			if (nombres.contains(nombre)) {
+					
+			} else {
+			
+			nombres.push(nombre);
+			
+			}
+
+        }
+
+
+		//recorremos el shape de nombres para obetener para cada nombre todas sus cargas utiles y sumarlas
+		for (var i = 0; i < nombres.length; i++) {
+		
+		     var payload = 0;
+			 ticks.push(nombres[i]);
+			 
+	
+	         for (var j = 0; j < valores.length; j++) {
+			 
+			    if ( valores[j]["sn"] == nombres[i]) {
+				
+				var peso = valores[j]["payload_truck"]
+				
+				    payload = parseFloat(payload) + parseFloat(peso.replace(",", "."));
+				
+				}
+
+			 }
+						 
+			 s1.push(payload);
+		
+	    }
+	
+	
+	
+        $.jqplot.config.enablePlugins = true;
+        //var s1 = [2, 6, 7, 10];
+        //var ticks = ['a', 'b', 'c', 'd'];
+         
+        plot1 = $.jqplot('grafico', [s1], {
+		    title: 'Payload per truck',
+            // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+            animate: !$.jqplot.use_excanvas,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true }
+            },
+			axesDefaults: {
+        tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+
+    },
+
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks,
+					tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+                tickOptions: {
+                    angle: 90,
+					labelPosition: 'middle',	
+                    fontSize: '9pt'					
+                },
+
+			  }
+            },
+            highlighter: { show: false }
+        });
+		
+		
+		
+	
+	}			
+
+
+
+
+//Main function, connection with the romain database
+/*
+$(function() {
+
+    $.ajax({
+        type: "GET",
+        //crossDomain: true,
+        url: "http://fleetGIS:mangeonsdespatates@54.154.103.152:3000/truckdata?site=cvh&startdate=" + timeopen + "&enddate=" + timefinish,
+
+        dataType: 'json',
+
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("Authorization", "Basic " + btoa("fleetGIS" + ":" + "mangeonsdespatates"));
+        },
+
+        success: function(data, textStatus, jqXHR) {
+
+            valores = data.rows;
+            statistics(valores);
+			
+						
+
+
+        },
+
+        fail: function(jqXHR, textStatus, errorThrown) {
+            if (console && console.log) {
+                console.log("Something failed: " + textStatus);
+            }
+        }
+
+    })
+});	
+*/
+
+$(function() {
+
+    $.ajax({
+        type: "GET",
+        //crossDomain: true,
+        url: "generarJSON.php",
+        dataType: 'json',
+		async: false,
+
+
+
+        success: function(data, textStatus, jqXHR) {
+
+            valores = data;
+            statistics(valores);
+
+        },
+
+        fail: function(jqXHR, textStatus, errorThrown) {
+            if (console && console.log) {
+                console.log("Something failed: " + textStatus);
+            }
+        }
+
+    })
+});
+
+
+	
+
+function statistics(valores){ 
+	
+	
+	$("#grafico").show(); //hacemos visible el grafico
+	
+	    var horas = []; //Array para guardar los nombres de las maquinas
+		var s2 = [];  //Array para guardar los valores del grafico
+		var ticks = [];  //Array para guardar los 
+		var suma0= 0;
+		var suma1= 0;
+		var suma2= 0;
+		var suma3= 0;
+		var suma4= 0;
+		var suma5= 0;
+		var suma6= 0;
+		var suma7= 0;
+		var suma8= 0;
+		var suma9= 0;
+		var suma10= 0;
+		var suma11= 0;
+		var suma12= 0;
+		
+		for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+            var hora = valores[i]["time"].substring(11,19);
+			
+			if (hora=='00:00:00') {
+			
+				var payload0 = valores[i]["payload_truck"];
+				
+				var tones0= parseFloat(payload0.replace(",", "."));
+				suma0= suma0+tones0;
+				
+				
+			}else if (hora=='01:00:00') {
+			
+				var payload1 = valores[i]["payload_truck"];
+				
+				var tones1= parseFloat(payload1.replace(",", "."));
+				suma1= suma1+tones1;
+			
+			}else if (hora=='02:00:00') {
+			
+				var payload2 = valores[i]["payload_truck"];
+				
+				var tones2= parseFloat(payload2.replace(",", "."));
+				suma2= suma2+tones2;
+		
+			}else if (hora=='03:00:00') {
+			
+				var payload3 = valores[i]["payload_truck"];
+				
+				var tones3= parseFloat(payload3.replace(",", "."));
+				suma3= suma3+tones3;
+			
+			}else if (hora=='04:00:00') {
+			
+				var payload4 = valores[i]["payload_truck"];
+			
+				var tones4= parseFloat(payload5.replace(",", "."));
+				suma4= suma4+tones4;
+				
+			}else if (hora=='05:00:00') {
+			
+				var payload5 = valores[i]["payload_truck"];
+				
+				var tones5= parseFloat(payload5.replace(",", "."));
+				suma5= suma5+tones5;
+				
+			}else if (hora=='06:00:00') {
+			
+				var payload6 = valores[i]["payload_truck"];
+				
+				var tones6= parseFloat(payload6.replace(",", "."));
+				suma6= suma6+tones6;
+				
+			}else if (hora=='07:00:00') {
+			
+				var payload7 = valores[i]["payload_truck"];
+				
+				var tones7= parseFloat(payload7.replace(",", "."));
+				suma7= suma7+tones7;
+				
+			}else if (hora=='08:00:00') {
+			
+				var payload8 = valores[i]["payload_truck"];
+				
+				var tones8= parseFloat(payload8.replace(",", "."));
+				suma8= suma8+tones8;
+			
+			}else if (hora=='09:00:00'){
+			
+				var payload9 = valores[i]["payload_truck"];
+				
+				var tones9= parseFloat(payload9.replace(",", "."));
+				suma9= suma9+tones9;
+			
+			}else if (hora=='10:00:00') {
+			
+				var payload10 = valores[i]["payload_truck"];
+				
+				var tones10= parseFloat(payload10.replace(",", "."));
+				suma10= suma10+tones10;
+				
+			} else if (hora=='11:00:00'){
+			
+				var payload11 = valores[i]["payload_truck"];
+				
+				var tones11= parseFloat(payload11.replace(",", "."));
+				suma11= suma11+tones11;
+				
+			}else if (hora=='12:00:00'){
+			
+				var payload12 = valores[i]["payload_truck"];
+				
+				var tones12= parseFloat(payload12.replace(",", "."));
+				suma12= suma12+tones12;
+				
+			}
+			
+        }
+		s2.push(suma0);
+		s2.push(suma1);
+		s2.push(suma2);
+		s2.push(suma3);
+		s2.push(suma4);
+		s2.push(suma5);
+		s2.push(suma6);
+		s2.push(suma7);
+		s2.push(suma8);
+		s2.push(suma9);
+		s2.push(suma10);
+		s2.push(suma11);
+		s2.push(suma12);
+		
+		
+		
+		
+/*	//recorremos el shape de nombres para obetener para cada nombre todas sus cargas utiles y sumarlas
+		for (var i = 0; i < nombres.length; i++) {
+		
+		     var payload = 0;
+			 ticks.push(nombres[i]);
+			 
+	
+	         for (var j = 0; j < valores.length; j++) {
+			 
+			    if ( valores[j]["sn"] == nombres[i]) {
+				
+				var peso = valores[j]["payload_truck"]
+				
+				    payload = parseFloat(payload) + parseFloat(peso.replace(",", "."));
+				
+				}
+
+			 }
+						 
+			 s1.push(payload);
+		
+	    }
+*/	
+	
+	$('#grafico').highcharts({
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Monthly Average Rainfall'
+        },
+        subtitle: {
+            text: 'Source: WorldClimate.com'
+        },
+        xAxis: {
+            categories: [
+                '00',
+                '01',
+                '02',
+				'03',
+				'04',
+				'05',
+				'06',
+				'07',
+				'08',
+				'09',
+				'10',
+				'11',
+				'12',
+				
+                
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Rainfall (mm)'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+			
+        },
+		exporting: { enabled: false },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Tokyo',
+            data: s2
+
+        }]
+    
+    });
+
+	
+	
+	}			
+	
+
+    </script>
+
+
+
+
+</body>
+</html>
