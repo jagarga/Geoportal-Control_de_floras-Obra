@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Statistics</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <style>
+	
+	/* Arreglo del tamaño de la leyenda de los graficos en firefox (no compatible) */
+@-moz-document url-prefix() {	
+#grafico table.jqplot-table-legend {
+    width:119px;
+}
+
+#grafico3 table.jqplot-table-legend {
+    width:119px;
+}
+
+}
+
+
+    </style>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
+    <link href="CSS/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <!-- Filesaver to save files -->
+    <script language="javascript" type="text/javascript" src="https://cdn.rawgit.com/eligrey/Blob.js/0cef2746414269b16834878a8abc52eb9d53e6bd/Blob.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+
+    <!-- JSPDF to export to pdf files -->
+    <script language="javascript" type="text/javascript" src="js/jspdf/jspdf.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/addimage.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/png_support.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/png.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/zlib.js"></script>
+
+    <!-- jqplot, to mae plots and graphs -->
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.barRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.categoryAxisRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.pieRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.pointLabels.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.canvasAxisTickRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.canvasAxisLabelRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.canvasTextRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.toImage.js"></script>
+
+    <link href="CSS/jquery.jqplot.css" rel="stylesheet">
+
+</head>
+
+<body style="padding:10px">
+
+    <ul class="nav nav-tabs" role="tablist" id="tabs">
+        <li role="presentation" class="active" id="menu1">
+            <a href="#production" aria-controls="production" role="tab" data-toggle="tab">Production</a></li>
+        <li role="presentation" id="menu2"><a href="#potential" aria-controls="potential" role="tab" data-toggle="tab">Potential for improvement</a></li>
+        <li role="presentation" id="menu3"><a href="#machine" aria-controls="machine" role="tab" data-toggle="tab">Machine</a></li>
+    </ul>
+
+
+    <div class="tab-content">
+
+
+        <div role="tabpanel" class="tab-pane fade in active" id="production">
+            </br>
+            <div class="btn-group">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Graphic <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" id="action1-1">Total cycle times per Load zone</a></li>
+                    <li><a href="#" id="action1-2">Total cycle times per Dump zone</a></li>
+                    <li><a href="#" id="action1-3">Total payload per Load zone</a></li>
+                    <li><a href="#" id="action1-4">Total payload per Dump zone</a></li>
+                </ul>
+            </div>
+            </br>
+            <div class="row">
+                <div class="col-xs-12 col-sm-9 col-md-9">
+                    <div id="grafico" style="height:90%;width:90%; display: none;"></div>
+                </div>
+                <div class="col-xs-12 col-sm-3 col-md-3">
+                    <div class="btn-group-vertical" role="group" aria-label="...">
+                        </br>
+                        <button type="button" class="btn btn-default" onclick="saveimage('#grafico');">Save graphic data as image</button>
+                        <button type="button" class="btn btn-default" onclick="createpdf('#grafico');">Export to PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div rol="tabpanel" class="tab-pane fade" id="potential">
+            </br>
+            <div class="btn-group">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Graphic <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" id="action2-1">Cycle time distribution</a></li>
+                    <li><a href="#" id="action2-2">Stopped time empty distribution</a></li>
+                    <li><a href="#" id="action2-3">Stopped time loaded distribution</a></li>
+                    <li><a href="#" id="action2-4">Travel time empty distribution</a></li>
+                    <li><a href="#" id="action2-5">Travel time loaded distribution</a></li>
+                    <li><a href="#" id="action2-6">Load time distribution</a></li>
+                </ul>
+            </div>
+            </br>
+            <div class="row">
+                <div class="col-xs-12 col-sm-9 col-md-9">
+                    <div id="grafico2" style="height:90%;width:90%; display: none;"></div>
+                </div>
+                <div class="col-xs-12 col-sm-3 col-md-3">
+                    <center>
+                        <div class="btn-group-vertical" role="group" aria-label="...">
+                            </br>
+                            <button type="button" class="btn btn-default" onclick="saveimage('#grafico2');">Save graphic data as image</button>
+                            <button type="button" class="btn btn-default" onclick="createpdf('#grafico2');">Export to PDF</button>
+                        </div>
+                    </center>
+                </div>
+            </div>
+        </div>
+
+
+        <div rol="tabpanel" class="tab-pane fade" id="machine">
+            </br>
+            <div class="btn-group">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Graphic <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" id="action3-1">Dumpers Cycle time distribution</a></li>
+                    <li><a href="#" id="action3-2">Loaders loading time</a></li>
+                </ul>
+            </div>
+            </br>
+            <div class="row">
+                <div class="col-xs-12 col-sm-9 col-md-9">
+                    <div id="grafico3" style="height:90%;width:90%; display: none;"></div>
+                </div>
+                <div class="col-xs-12 col-sm-3 col-md-3">
+                    <center>
+                        <div class="btn-group-vertical" role="group" aria-label="...">
+                            </br>
+                            <button type="button" class="btn btn-default" onclick="saveimage('#grafico3');">Save graphic data as image</button>
+                            <button type="button" class="btn btn-default" onclick="createpdf('#grafico3');">Export to PDF</button>
+                        </div>
+                    </center>
+                </div>
+            </div>
+    </div>
+
+
+    <script type="text/javascript">
+        var plot; //Variable que guarda el plot actual
+        var pagina = getParameter('pagina'); //recibimos el tiempo pasado como entrada
+        var valores = window.opener.valoresseleccionados;
+
+
+        Array.prototype.contains = function(elem) {
+            for (var i in this) {
+                if (this[i] == elem) return true;
+            }
+            return false;
+        }
+
+
+
+        //función que devuelve el parametro pasado por la url desde el objeto padre
+        function getParameter(parameter) {
+
+            // Obtiene la cadena completa de URL
+            var url = location.href;
+            /* Obtiene la posicion donde se encuentra el signo ?, ahi es donde empiezan los parametros */
+            var index = url.indexOf("?");
+            /* Obtiene la posicion donde termina el nombre del parametro e inicia el signo = */
+            index = url.indexOf(parameter, index) + parameter.length;
+            /* Verifica que efectivamente el valor en la posicion actuales el signo = */
+            if (url.charAt(index) == "=") {
+                // Obtiene el valor del parametro
+                var result = url.indexOf("&", index);
+                if (result == -1) {
+                    result = url.length;
+                };
+                // Despliega el valor del parametro
+                var resultado = url.substring(index + 1, result);
+                return resultado;
+                //alert(resultado);
+            }
+
+        }
+
+
+        //Comprobamos la pagina del menu que se ha solicitado, y desacivamos el resto de elementos
+        if (pagina == 1) {
+            $("#menu2").css({
+                display: 'none'
+            });
+            $("#menu3").css({
+                display: 'none'
+            });
+            timeperzone(valores, 'Load');
+        }
+
+        if (pagina == 2) {
+            $("#menu1").css({
+                display: 'none'
+            });
+            $("#menu3").css({
+                display: 'none'
+            });
+            $("#menu1").removeClass("active");
+            $("#menu2").addClass("active");
+            $("#production").removeClass("tab-pane fade in active");
+            $("#production").addClass("tab-pane fade");
+            $("#potential").removeClass("tab-pane fade");
+            $("#potential").addClass("tab-pane fade in active");
+            cycletime(valores);
+        }
+
+        if (pagina == 3) {
+            $("#menu1").css({
+                display: 'none'
+            });
+            $("#menu2").css({
+                display: 'none'
+            });
+            $("#menu1").removeClass("active");
+            $("#menu3").addClass("active");
+            $("#production").removeClass("tab-pane fade in active");
+            $("#production").addClass("tab-pane fade");
+            $("#machine").removeClass("tab-pane fade");
+            $("#machine").addClass("tab-pane fade in active");
+			statistics_dumpers(valores);
+        }
+
+        if (pagina == 4) {
+            timeperzone(valores, 'Load');
+        }
+
+
+        //GRAFICOS
+
+        //Graficos de production
+
+        //Grafico que muestra el payload por zona
+        function payloadperzone(valores, zone) {
+
+            $('#grafico').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico").show(); //hacemos visible el grafico
+
+            var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+            var orizones = [];
+            var destizones = [];
+            var payload_zones = [];
+
+            // recorremos los valores devueltos por la base de datos y creamos un array con una fila por cada zona con sus coordendas y su carga total
+            for (var i = 0; i < valores.length; i++) {
+
+                if (zone == 'Load') {
+                    var zoneorigin = (valores[i]["origin"]);
+                } else {
+                    var zoneorigin = (valores[i]["destination"]);
+                }
+                //Obtenemos las toneladas cargadas
+                var payload = (valores[i]["payload_truck"]).replace(",", ".");
+
+
+
+                //comprobamos si existe la zona 
+
+                if (auxzones.contains(zoneorigin)) { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+                    orizones[pos][1] = parseFloat(orizones[pos][1]) + parseFloat(payload);
+                    payload_zones[pos] = parseFloat(payload_zones[pos]) + parseFloat(payload);
+
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+                    orizones.push([zoneorigin, payload]);
+                    payload_zones.push(payload);
+
+                }
+
+            }
+
+            var zones = [];
+
+
+            for (var i = 0; i < auxzones.length; i++) {
+
+                eval('var s' + i + ' = [payload_zones[i]];');
+                eval('zones.push(s' + i + ');');
+
+            }
+
+            plot = $.jqplot('grafico', zones, {
+                title: 'Total payload per ' + zone + ' zone',
+                stackSeries: true,
+                captureRightClick: true,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    rendererOptions: {
+                        highlightMouseDown: true,
+                        barWidth: 100
+                    },
+
+
+
+                },
+
+                legend: {
+                    show: true,
+                    location: 'e',
+                    placement: 'outside',
+                    labels: auxzones
+                },
+                axes: {
+
+                    xaxis: {
+                        label: [auxzones],
+                        tickOptions: {
+                            show: false
+                        },
+                        renderer: $.jqplot.CategoryAxisRenderer,
+
+                    },
+                    yaxis: {
+                        label: 'Payload',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                }
+            });
+
+        }
+
+        //Grafico que muestra el nmero de ciclos en cada intervalo del tiempo total de ciclo
+        function timeperzone(valores, zone) {
+
+            $('#grafico').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico").show(); //hacemos visible el grafico
+
+            var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+            var orizones = [];
+            var destizones = [];
+
+            var load_travel = [];
+            var empty_travel = [];
+            var loading = [];
+            var stopped_loaded = [];
+            var stopped_empty = [];
+
+            // recorremos los valores devueltos por la base de datos y creamos un array con una fila por cada zona con sus coordendas y su carga total
+            for (var i = 0; i < valores.length; i++) {
+
+                //obtenemos las zonas
+
+                if (zone == 'Load') {
+                    var zoneorigin = (valores[i]["origin"]);
+                } else {
+                    var zoneorigin = (valores[i]["destination"]);
+                }
+                //Obtenemos las toneladas cargadas
+                var payload = (valores[i]["payload_truck"]).replace(",", ".");
+
+                //obtenemos los tiempos
+                var load_travel_time = (valores[i]["Travel_time_loaded"]);
+                var empty_travel_time = (valores[i]["Travel_time_empty"]);
+                var loading_time = (valores[i]["Load_time"]);
+                var stopped_time_loaded = (valores[i]["Stopped_time_loaded"]);
+                var stopped_time_empty = (valores[i]["Stopped_time_empty"]);
+
+
+                //comprobamos si existe la zona 
+
+                if (auxzones.contains(zoneorigin)) { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+                    load_travel[pos] = parseFloat(load_travel[pos]) + (parseFloat(load_travel_time) / 3600);
+                    empty_travel[pos] = parseFloat(empty_travel[pos]) + (parseFloat(empty_travel_time) / 3600);
+                    loading[pos] = parseFloat(loading[pos]) + (parseFloat(loading_time) / 3600);
+                    stopped_loaded[pos] = parseFloat(stopped_loaded[pos]) + (parseFloat(stopped_time_loaded) / 3600);
+                    stopped_empty[pos] = parseFloat(stopped_empty[pos]) + (parseFloat(stopped_time_loaded) / 3600);
+
+                    //orizones[pos][4] = parseInt(orizones[pos][4]) + parseInt(cycletime);
+                    //orizones[pos][5] = (orizones[pos][5]) + ',' + (id);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+                    load_travel.push(parseFloat(load_travel_time) / 3600);
+                    empty_travel.push(parseFloat(empty_travel_time) / 3600);
+                    loading.push((parseFloat(loading_time) / 3600));
+                    stopped_loaded.push(parseFloat(stopped_time_loaded) / 3600);
+                    stopped_empty.push(parseFloat(stopped_time_loaded) / 3600);
+
+                }
+
+
+            }
+
+
+            plot = $.jqplot('grafico', [load_travel, empty_travel, loading, stopped_loaded, stopped_empty], {
+
+                title: 'Total cycle times per ' + zone + ' zone',
+                stackSeries: true,
+                captureRightClick: true,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    shadowAngle: 135,
+                    rendererOptions: {
+                        highlightMouseDown: true,
+                        barWidth: 100
+                    },
+                    pointLabels: {
+                        show: false,
+                        formatString: '%d'
+                    }
+                },
+                legend: {
+                    show: true,
+                    location: 'e',
+                    placement: 'outside',
+                    labels: ['Load Travel Time', 'Empty Travel Time', 'Loading Time', 'Stopped Time Loaded', 'Stopped Time Empty']
+                },
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: auxzones,
+                        label: zone + ' zones',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    },
+                    yaxis: {
+                        label: 'Time in hours',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+
+                }
+            });
+
+
+        }
+
+
+
+
+        //Graficos de Potential improvement
+
+        //Grafico que muestra el nmero de ciclos en cada intervalo del tiempo total de ciclo
+        function cycletime(valores) {
+
+            $('#grafico2').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico2").show(); //hacemos visible el grafico
+
+			//Para obtener las zonas de origen y destino
+			var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+			
+            var s1 = []; //Array para guardar los valores del grafico
+            var ticks = []; //Array para guardar los nombres
+            var num = 0,
+                num2 = 0,
+                num3 = 0,
+                num4 = 0,
+                num5 = 0,
+                num6 = 0,
+                num7 = 0,
+                num8 = 0,
+                num9 = 0,
+                num10 = 0,
+                num11 = 0,
+                num12 = 0,
+                num13 = 0,
+                num14 = 0,
+                num15 = 0,
+                num16 = 0; //variables para guardar el numero de ciclos de cada intervalo
+
+            for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+                var stoptime = valores[i]["cycle_time"]; //Obtenemos el tiempo de cada ciclo
+
+                //Obtenemos el numero de ciclos dentro de cada intervalo de tiempo
+                if (stoptime < 300) {
+
+                    num = num + 1;
+
+                } else if (stoptime < 360 & stoptime > 300) {
+
+                    num2 = num2 + 1;
+
+                } else if (stoptime < 420 & stoptime > 360) {
+
+                    num3 = num3 + 1;
+
+                } else if (stoptime < 480 & stoptime > 420) {
+
+                    num4 = num4 + 1;
+
+                } else if (stoptime < 540 & stoptime > 480) {
+
+                    num5 = num5 + 1;
+
+                } else if (stoptime < 600 & stoptime > 540) {
+
+                    num6 = num6 + 1;
+
+                } else if (stoptime < 660 & stoptime > 600) {
+
+                    num7 = num7 + 1;
+
+                } else if (stoptime < 720 & stoptime > 660) {
+
+                    num8 = num8 + 1;
+
+                } else if (stoptime < 900 & stoptime > 720) {
+
+                    num9 = num9 + 1;
+
+                } else if (stoptime < 1080 & stoptime > 900) {
+
+                    num10 = num10 + 1;
+
+                } else if (stoptime < 1260 & stoptime > 1080) {
+
+                    num11 = num11 + 1;
+
+                } else if (stoptime < 1500 & stoptime > 1260) {
+
+                    num12 = num12 + 1;
+
+                } else if (stoptime < 1800 & stoptime > 1500) {
+
+                    num13 = num13 + 1;
+
+                } else if (stoptime < 2400 & stoptime > 1800) {
+
+                    num14 = num14 + 1;
+
+                } else if (stoptime < 3000 & stoptime > 2400) {
+
+                    num15 = num15 + 1;
+
+                } else if (stoptime > 3000) {
+
+                    num16 = num16 + 1;
+
+                }
+
+
+                    var zoneorigin = (valores[i]["origin"]);
+                    var zonedestin = (valores[i]["destination"]);
+
+
+                if (auxzones.indexOf(zoneorigin)!='-1') { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+
+                }
+				if (auxzones2.contains(zonedestin)) { //si existe le sumamos la carga
+
+                    var pos2 = auxzones2.indexOf(zonedestin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones2.push(zonedestin);
+
+                }
+				
+		
+
+            }
+
+            $.jqplot.config.enablePlugins = true;
+            var s1 = [num, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16];
+            var ticks = ['<5min', '5-6min', '6-7min', '7-8min', '8-9min', '9-10min', '10-11min', '11-12min', '12-15min', '15-18min', '18-21min', '21-25min', '25-30min', '30-40min', '40-50min', '>50min'];
+            var label ='Cycle time from ' + auxzones + ' to ' + auxzones2;
+			//var s1 = [2, 6, 7, 10,2, 6, 7, 10];
+            //var ticks = ['a', 'b', 'c', 'd','a', 'b', 'c', 'd'];
+
+            plot = $.jqplot('grafico2', [s1], {
+                title: 'Cycle time distribution',
+                // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                animate: !$.jqplot.use_excanvas,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    pointLabels: {
+                        show: true
+                    }
+                },
+                axesDefaults: {
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+
+                },
+
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: ticks,
+                        label: label,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        tickOptions: {
+                            angle: 0,
+                            labelPosition: 'middle',
+                            fontSize: '9pt'
+                        },
+                    },
+                    yaxis: {
+                        label: 'Number of cycles',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                },
+                highlighter: {
+                    show: false
+                }
+            });
+
+        }
+
+
+        //Grafico que muestra el nmero de ciclos en cada intervalo de tiempo de stopped time loaded
+        function stoptimeempty(valores) {
+
+            $('#grafico2').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico2").show(); //hacemos visible el grafico
+			
+			            var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+
+            var s1 = []; //Array para guardar los valores del grafico
+            var ticks = []; //Array para guardar los nombres
+            var num = 0,
+                num2 = 0,
+                num3 = 0,
+                num4 = 0,
+                num5 = 0,
+                num6 = 0,
+                num7 = 0,
+                num8 = 0,
+                num9 = 0,
+                num10 = 0,
+                num11 = 0,
+                num12 = 0,
+                num13 = 0,
+                num14 = 0,
+                num15 = 0,
+                num16 = 0; //variables para guardar el numero de ciclos de cada intervalo
+
+            for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+                var stoptime = valores[i]["Stopped_time_empty"]; //Obtenemos el tiempo de cada ciclo
+
+                //Obtenemos el numero de ciclos dentro de cada intervalo de tiempo
+                if (stoptime < 10) {
+
+                    num = num + 1;
+
+                } else if (stoptime < 20 & stoptime > 10) {
+
+                    num2 = num2 + 1;
+
+                } else if (stoptime < 40 & stoptime > 20) {
+
+                    num3 = num3 + 1;
+
+                } else if (stoptime < 60 & stoptime > 40) {
+
+                    num4 = num4 + 1;
+
+                } else if (stoptime < 120 & stoptime > 60) {
+
+                    num5 = num5 + 1;
+
+                } else if (stoptime < 180 & stoptime > 120) {
+
+                    num6 = num6 + 1;
+
+                } else if (stoptime < 240 & stoptime > 180) {
+
+                    num7 = num7 + 1;
+
+                } else if (stoptime < 300 & stoptime > 240) {
+
+                    num8 = num8 + 1;
+
+                } else if (stoptime < 360 & stoptime > 300) {
+
+                    num9 = num9 + 1;
+
+                } else if (stoptime < 420 & stoptime > 360) {
+
+                    num10 = num10 + 1;
+
+                } else if (stoptime < 480 & stoptime > 420) {
+
+                    num11 = num11 + 1;
+
+                } else if (stoptime < 540 & stoptime > 480) {
+
+                    num12 = num12 + 1;
+
+                } else if (stoptime < 600 & stoptime > 540) {
+
+                    num13 = num13 + 1;
+
+                } else if (stoptime < 900 & stoptime > 600) {
+
+                    num14 = num14 + 1;
+
+                } else if (stoptime < 1200 & stoptime > 900) {
+
+                    num15 = num15 + 1;
+
+                } else if (stoptime > 1200) {
+
+                    num16 = num16 + 1;
+
+                }
+
+                    var zoneorigin = (valores[i]["origin"]);
+                    var zonedestin = (valores[i]["destination"]);
+
+
+                if (auxzones.contains(zoneorigin)) { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+
+                }
+				if (auxzones2.contains(zonedestin)) { //si existe le sumamos la carga
+
+                    var pos2 = auxzones2.indexOf(zonedestin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones2.push(zonedestin);
+
+                }
+
+
+            }
+
+
+            $.jqplot.config.enablePlugins = true;
+            var s1 = [num, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16];
+            var ticks = ['<10s', '10-20s', '20-40s', '40-60s', '1-2min', '2-3min', '3-4min', '4-5min', '5-6min', '6-7min', '7-8min', '8-9min', '9-10min', '10-15min', '15-20min', '>20min'];
+            var label ='Stopped time empty from ' + auxzones + ' to ' + auxzones2;
+			//var s1 = [2, 6, 7, 10,2, 6, 7, 10];
+            //var ticks = ['a', 'b', 'c', 'd','a', 'b', 'c', 'd'];
+
+            plot = $.jqplot('grafico2', [s1], {
+                title: 'Stopped time empty distribution',
+                // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                animate: !$.jqplot.use_excanvas,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    pointLabels: {
+                        show: true
+                    }
+                },
+                axesDefaults: {
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+
+                },
+
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: ticks,
+                        label: label,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        tickOptions: {
+                            angle: 0,
+                            labelPosition: 'middle',
+                            fontSize: '9pt'
+                        },
+                    },
+                    yaxis: {
+                        label: 'Number of cycles',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                },
+                highlighter: {
+                    show: false
+                }
+            });
+
+        }
+
+
+        //Grafico que muestra el nmero de ciclos en cada intervalo de tiempo de stopped time loaded
+        function stoptimeload(valores) {
+
+            $('#grafico2').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico2").show(); //hacemos visible el grafico
+			
+            var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+
+            var s1 = []; //Array para guardar los valores del grafico
+            var ticks = []; //Array para guardar los nombres
+            var num = 0,
+                num2 = 0,
+                num3 = 0,
+                num4 = 0,
+                num5 = 0,
+                num6 = 0,
+                num7 = 0,
+                num8 = 0,
+                num9 = 0,
+                num10 = 0,
+                num11 = 0,
+                num12 = 0,
+                num13 = 0,
+                num14 = 0,
+                num15 = 0,
+                num16 = 0; //variables para guardar el numero de ciclos de cada intervalo
+
+            for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+                var stoptime = valores[i]["Stopped_time_loaded"]; //Obtenemos el tiempo de cada ciclo
+
+                //Obtenemos el numero de ciclos dentro de cada intervalo de tiempo
+                if (stoptime < 10) {
+
+                    num = num + 1;
+
+                } else if (stoptime < 20 & stoptime > 10) {
+
+                    num2 = num2 + 1;
+
+                } else if (stoptime < 40 & stoptime > 20) {
+
+                    num3 = num3 + 1;
+
+                } else if (stoptime < 60 & stoptime > 40) {
+
+                    num4 = num4 + 1;
+
+                } else if (stoptime < 120 & stoptime > 60) {
+
+                    num5 = num5 + 1;
+
+                } else if (stoptime < 180 & stoptime > 120) {
+
+                    num6 = num6 + 1;
+
+                } else if (stoptime < 240 & stoptime > 180) {
+
+                    num7 = num7 + 1;
+
+                } else if (stoptime < 300 & stoptime > 240) {
+
+                    num8 = num8 + 1;
+
+                } else if (stoptime < 360 & stoptime > 300) {
+
+                    num9 = num9 + 1;
+
+                } else if (stoptime < 420 & stoptime > 360) {
+
+                    num10 = num10 + 1;
+
+                } else if (stoptime < 480 & stoptime > 420) {
+
+                    num11 = num11 + 1;
+
+                } else if (stoptime < 540 & stoptime > 480) {
+
+                    num12 = num12 + 1;
+
+                } else if (stoptime < 600 & stoptime > 540) {
+
+                    num13 = num13 + 1;
+
+                } else if (stoptime < 900 & stoptime > 600) {
+
+                    num14 = num14 + 1;
+
+                } else if (stoptime < 1200 & stoptime > 900) {
+
+                    num15 = num15 + 1;
+
+                } else if (stoptime > 1200) {
+
+                    num16 = num16 + 1;
+
+                }
+
+
+                    var zoneorigin = (valores[i]["origin"]);
+                    var zonedestin = (valores[i]["destination"]);
+
+
+                if (auxzones.contains(zoneorigin)) { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+
+                }
+				if (auxzones2.contains(zonedestin)) { //si existe le sumamos la carga
+
+                    var pos2 = auxzones2.indexOf(zonedestin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones2.push(zonedestin);
+
+                }
+				
+
+            }
+
+
+            $.jqplot.config.enablePlugins = true;
+            var s1 = [num, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16];
+            var ticks = ['<10s', '10-20s', '20-40s', '40-60s', '1-2min', '2-3min', '3-4min', '4-5min', '5-6min', '6-7min', '7-8min', '8-9min', '9-10min', '10-15min', '15-20min', '>20min'];
+         	var label ='Stopped time loaded from ' + auxzones + ' to ' + auxzones2;
+			//var s1 = [2, 6, 7, 10,2, 6, 7, 10];
+            //var ticks = ['a', 'b', 'c', 'd','a', 'b', 'c', 'd'];
+
+            plot = $.jqplot('grafico2', [s1], {
+                title: 'Stopped time loaded distribution',
+                // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                animate: !$.jqplot.use_excanvas,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    pointLabels: {
+                        show: true
+                    }
+                },
+                axesDefaults: {
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+
+                },
+
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: ticks,
+                        label: label,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        tickOptions: {
+                            angle: 0,
+                            labelPosition: 'middle',
+                            fontSize: '9pt'
+                        },
+                    },
+                    yaxis: {
+                        label: 'Number of cycles',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                },
+                highlighter: {
+                    show: false
+                }
+            });
+
+        }
+
+
+        //Grafico que muestra el nmero de ciclos en cada intervalo de tiempo de Travel time empty
+        function traveltimeempty(valores) {
+
+            $('#grafico2').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico2").show(); //hacemos visible el grafico
+			
+			            var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+
+            var s1 = []; //Array para guardar los valores del grafico
+            var ticks = []; //Array para guardar los nombres
+            var num = 0,
+                num2 = 0,
+                num3 = 0,
+                num4 = 0,
+                num5 = 0,
+                num6 = 0,
+                num7 = 0,
+                num8 = 0,
+                num9 = 0,
+                num10 = 0,
+                num11 = 0,
+                num12 = 0,
+                num13 = 0,
+                num14 = 0,
+                num15 = 0,
+                num16 = 0; //variables para guardar el numero de ciclos de cada intervalo
+
+            for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+                var stoptime = valores[i]["Travel_time_empty"]; //Obtenemos el tiempo de cada ciclo
+
+                //Obtenemos el numero de ciclos dentro de cada intervalo de tiempo
+                if (stoptime < 10) {
+
+                    num = num + 1;
+
+                } else if (stoptime < 20 & stoptime > 10) {
+
+                    num2 = num2 + 1;
+
+                } else if (stoptime < 40 & stoptime > 20) {
+
+                    num3 = num3 + 1;
+
+                } else if (stoptime < 60 & stoptime > 40) {
+
+                    num4 = num4 + 1;
+
+                } else if (stoptime < 120 & stoptime > 60) {
+
+                    num5 = num5 + 1;
+
+                } else if (stoptime < 180 & stoptime > 120) {
+
+                    num6 = num6 + 1;
+
+                } else if (stoptime < 240 & stoptime > 180) {
+
+                    num7 = num7 + 1;
+
+                } else if (stoptime < 300 & stoptime > 240) {
+
+                    num8 = num8 + 1;
+
+                } else if (stoptime < 360 & stoptime > 300) {
+
+                    num9 = num9 + 1;
+
+                } else if (stoptime < 420 & stoptime > 360) {
+
+                    num10 = num10 + 1;
+
+                } else if (stoptime < 480 & stoptime > 420) {
+
+                    num11 = num11 + 1;
+
+                } else if (stoptime < 540 & stoptime > 480) {
+
+                    num12 = num12 + 1;
+
+                } else if (stoptime < 600 & stoptime > 540) {
+
+                    num13 = num13 + 1;
+
+                } else if (stoptime < 900 & stoptime > 600) {
+
+                    num14 = num14 + 1;
+
+                } else if (stoptime < 1200 & stoptime > 900) {
+
+                    num15 = num15 + 1;
+
+                } else if (stoptime > 1200) {
+
+                    num16 = num16 + 1;
+
+                }
+
+
+                    var zoneorigin = (valores[i]["origin"]);
+                    var zonedestin = (valores[i]["destination"]);
+
+
+                if (auxzones.contains(zoneorigin)) { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+
+                }
+				if (auxzones2.contains(zonedestin)) { //si existe le sumamos la carga
+
+                    var pos2 = auxzones2.indexOf(zonedestin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones2.push(zonedestin);
+
+                }
+
+            }
+
+
+            $.jqplot.config.enablePlugins = true;
+            var s1 = [num, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16];
+            var ticks = ['<10s', '10-20s', '20-40s', '40-60s', '1-2min', '2-3min', '3-4min', '4-5min', '5-6min', '6-7min', '7-8min', '8-9min', '9-10min', '10-15min', '15-20min', '>20min'];
+            var label ='Travel time empty from ' + auxzones + ' to ' + auxzones2;
+			//var s1 = [2, 6, 7, 10,2, 6, 7, 10];
+            //var ticks = ['a', 'b', 'c', 'd','a', 'b', 'c', 'd'];
+
+            plot = $.jqplot('grafico2', [s1], {
+                title: 'Travel time empty distribution',
+                // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                animate: !$.jqplot.use_excanvas,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    pointLabels: {
+                        show: true
+                    }
+                },
+                axesDefaults: {
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+
+                },
+
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: ticks,
+                        label: label,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        tickOptions: {
+                            angle: 0,
+                            labelPosition: 'middle',
+                            fontSize: '9pt'
+                        },
+                    },
+                    yaxis: {
+                        label: 'Number of cycles',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                },
+                highlighter: {
+                    show: false
+                }
+            });
+
+        }
+
+
+
+        //Grafico que muestra el nmero de ciclos en cada intervalo de tiempo de Travel time loaded
+        function traveltimeload(valores) {
+
+            $('#grafico2').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico2").show(); //hacemos visible el grafico
+			
+			            var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+
+            var s1 = []; //Array para guardar los valores del grafico
+            var ticks = []; //Array para guardar los nombres
+            var num = 0,
+                num2 = 0,
+                num3 = 0,
+                num4 = 0,
+                num5 = 0,
+                num6 = 0,
+                num7 = 0,
+                num8 = 0,
+                num9 = 0,
+                num10 = 0,
+                num11 = 0,
+                num12 = 0,
+                num13 = 0,
+                num14 = 0,
+                num15 = 0,
+                num16 = 0; //variables para guardar el numero de ciclos de cada intervalo
+
+            for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+                var stoptime = valores[i]["Travel_time_loaded"]; //Obtenemos el tiempo de cada ciclo
+
+                //Obtenemos el numero de ciclos dentro de cada intervalo de tiempo
+                if (stoptime < 60) {
+
+                    num = num + 1;
+
+                } else if (stoptime < 90 & stoptime > 60) {
+
+                    num2 = num2 + 1;
+
+                } else if (stoptime < 120 & stoptime > 90) {
+
+                    num3 = num3 + 1;
+
+                } else if (stoptime < 150 & stoptime > 120) {
+
+                    num4 = num4 + 1;
+
+                } else if (stoptime < 180 & stoptime > 150) {
+
+                    num5 = num5 + 1;
+
+                } else if (stoptime < 210 & stoptime > 180) {
+
+                    num6 = num6 + 1;
+
+                } else if (stoptime < 240 & stoptime > 210) {
+
+                    num7 = num7 + 1;
+
+                } else if (stoptime < 270 & stoptime > 240) {
+
+                    num8 = num8 + 1;
+
+                } else if (stoptime < 300 & stoptime > 270) {
+
+                    num9 = num9 + 1;
+
+                } else if (stoptime < 330 & stoptime > 300) {
+
+                    num10 = num10 + 1;
+
+                } else if (stoptime < 360 & stoptime > 330) {
+
+                    num11 = num11 + 1;
+
+                } else if (stoptime < 420 & stoptime > 360) {
+
+                    num12 = num12 + 1;
+
+                } else if (stoptime < 480 & stoptime > 420) {
+
+                    num13 = num13 + 1;
+
+                } else if (stoptime < 540 & stoptime > 480) {
+
+                    num14 = num14 + 1;
+
+                } else if (stoptime < 600 & stoptime > 540) {
+
+                    num15 = num15 + 1;
+
+                } else if (stoptime > 600) {
+
+                    num16 = num16 + 1;
+
+                }
+				
+
+                    var zoneorigin = (valores[i]["origin"]);
+                    var zonedestin = (valores[i]["destination"]);
+
+
+                if (auxzones.contains(zoneorigin)) { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+
+                }
+				if (auxzones2.contains(zonedestin)) { //si existe le sumamos la carga
+
+                    var pos2 = auxzones2.indexOf(zonedestin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones2.push(zonedestin);
+
+                }
+
+            }
+
+
+            $.jqplot.config.enablePlugins = true;
+            var s1 = [num, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16];
+            var ticks = ['<1min', '1-1.5min', '1.5-2min', '2-2.5min', '2.5-3min', '3-3.5min', '3.5-4min', '4-4.5min', '4.5-5min', '5-5.5min', '5.5-6min', '6-7min', '7-8min', '8-9min', '9-10min', '>10min'];
+            var label ='Travel time loaded from ' + auxzones + ' to ' + auxzones2;
+			//var s1 = [2, 6, 7, 10,2, 6, 7, 10];
+            //var ticks = ['a', 'b', 'c', 'd','a', 'b', 'c', 'd'];
+
+            plot = $.jqplot('grafico2', [s1], {
+                title: 'Travel time loaded distribution',
+                // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                animate: !$.jqplot.use_excanvas,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    pointLabels: {
+                        show: true
+                    }
+                },
+                axesDefaults: {
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+
+                },
+
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: ticks,
+                        label: label,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        tickOptions: {
+                            angle: 0,
+                            labelPosition: 'middle',
+                            fontSize: '9pt'
+                        },
+                    },
+                    yaxis: {
+                        label: 'Number of cycles',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                },
+                highlighter: {
+                    show: false
+                }
+            });
+
+        }
+
+
+        //Grafico que muestra el nmero de ciclos en cada intervalo de tiempo de carga
+        function loadtime(valores) {
+
+            $('#grafico2').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico2").show(); //hacemos visible el grafico
+			
+			            var auxzones = []; //variable auxiliar para localziar la poscion de la zona
+            var auxzones2 = [];
+
+            var s1 = []; //Array para guardar los valores del grafico
+            var ticks = []; //Array para guardar los nombres
+            var num = 0,
+                num2 = 0,
+                num3 = 0,
+                num4 = 0,
+                num5 = 0,
+                num6 = 0,
+                num7 = 0,
+                num8 = 0,
+                num9 = 0,
+                num10 = 0,
+                num11 = 0,
+                num12 = 0,
+                num13 = 0,
+                num14 = 0,
+                num15 = 0,
+                num16 = 0; //variables para guardar el numero de ciclos de cada intervalo
+
+            for (var i = 0; i < valores.length; i++) { //recorremos todos los datos y creamos un array con los nombres de las maquinas sin repetir
+
+                var stoptime = valores[i]["Load_time"]; //Obtenemos el tiempo de cada ciclo
+
+                //Obtenemos el numero de ciclos dentro de cada intervalo de tiempo
+                if (stoptime < 60) {
+
+                    num = num + 1;
+
+                } else if (stoptime < 90 & stoptime > 60) {
+
+                    num2 = num2 + 1;
+
+                } else if (stoptime < 120 & stoptime > 90) {
+
+                    num3 = num3 + 1;
+
+                } else if (stoptime < 150 & stoptime > 120) {
+
+                    num4 = num4 + 1;
+
+                } else if (stoptime < 180 & stoptime > 150) {
+
+                    num5 = num5 + 1;
+
+                } else if (stoptime < 210 & stoptime > 180) {
+
+                    num6 = num6 + 1;
+
+                } else if (stoptime < 240 & stoptime > 210) {
+
+                    num7 = num7 + 1;
+
+                } else if (stoptime < 270 & stoptime > 240) {
+
+                    num8 = num8 + 1;
+
+                } else if (stoptime < 300 & stoptime > 270) {
+
+                    num9 = num9 + 1;
+
+                } else if (stoptime < 330 & stoptime > 300) {
+
+                    num10 = num10 + 1;
+
+                } else if (stoptime < 360 & stoptime > 330) {
+
+                    num11 = num11 + 1;
+
+                } else if (stoptime < 420 & stoptime > 360) {
+
+                    num12 = num12 + 1;
+
+                } else if (stoptime < 480 & stoptime > 420) {
+
+                    num13 = num13 + 1;
+
+                } else if (stoptime < 540 & stoptime > 480) {
+
+                    num14 = num14 + 1;
+
+                } else if (stoptime < 600 & stoptime > 540) {
+
+                    num15 = num15 + 1;
+
+                } else if (stoptime > 600) {
+
+                    num16 = num16 + 1;
+
+                }
+
+                    var zoneorigin = (valores[i]["origin"]);
+                    var zonedestin = (valores[i]["destination"]);
+
+
+                if (auxzones.contains(zoneorigin)) { //si existe le sumamos la carga
+
+                    var pos = auxzones.indexOf(zoneorigin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones.push(zoneorigin);
+
+                }
+				if (auxzones2.contains(zonedestin)) { //si existe le sumamos la carga
+
+                    var pos2 = auxzones2.indexOf(zonedestin);
+
+                } else { //si no existe creamos la fila perteniente a esa zona
+
+                    auxzones2.push(zonedestin);
+
+                }				
+				
+            }
+
+
+            $.jqplot.config.enablePlugins = true;
+            var s1 = [num, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16];
+            var ticks = ['<1min', '1-1.5min', '1.5-2min', '2-2.5min', '2.5-3min', '3-3.5min', '3.5-4min', '4-4.5min', '4.5-5min', '5-5.5min', '5.5-6min', '6-7min', '7-8min', '8-9min', '9-10min', '>10min'];
+            var label ='Load time from ' + auxzones + ' to ' + auxzones2;
+			//var s1 = [2, 6, 7, 10,2, 6, 7, 10];
+            //var ticks = ['a', 'b', 'c', 'd','a', 'b', 'c', 'd'];
+
+            plot = $.jqplot('grafico2', [s1], {
+                title: 'Load time distribution',
+                // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                animate: !$.jqplot.use_excanvas,
+                seriesDefaults: {
+                    renderer: $.jqplot.BarRenderer,
+                    pointLabels: {
+                        show: true
+                    }
+                },
+                axesDefaults: {
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+
+                },
+
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: ticks,
+                        label: label,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        tickOptions: {
+                            angle: 0,
+                            labelPosition: 'middle',
+                            fontSize: '9pt'
+                        },
+                    },
+                    yaxis: {
+                        label: 'Number of cycles',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                },
+                highlighter: {
+                    show: false
+                }
+            });
+
+        }
+
+
+	
+	//Graficos de Machine
+	
+		function statistics_dumpers(valores) {
+
+		    $('#grafico3').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico3").show(); //hacemos visible el grafico
+		
+	    var auxdumper = []; //variable auxiliar para localziar los dumpers	    
+	  
+	   
+		var load_travel = [];
+		var empty_travel = [];
+		var loading = [];
+		var stopped_loaded = [];
+		var stopped_empty = [];
+		
+	    // recorremos los valores devueltos por la base de datos y creamos un array con una fila por cada zona con sus coordendas y su carga total
+	    for (var i = 0; i < valores.length; i++) {
+
+	        //obtenemos las zonas
+	        var name_dumper = (valores[i]["sn"]).trim();
+	       //var name_dumper = valores[i]["sn"].substring(0,5);
+			
+			//obtenemos los tiempos
+			var load_travel_time = (valores[i]["Travel_time_loaded"]);
+			var empty_travel_time = (valores[i]["Travel_time_empty"]);
+			var loading_time = (valores[i]["Load_time"]);
+			var stopped_time_loaded = (valores[i]["Stopped_time_loaded"]);
+			var stopped_time_empty = (valores[i]["Stopped_time_empty"]);
+			
+	      
+	        //comprobamos si existe la zona 
+
+	        if (auxdumper.contains(name_dumper)) { //si existe le sumamos la carga
+				
+	            var pos = auxdumper.indexOf(name_dumper);
+	            load_travel[pos] = parseFloat(load_travel[pos]) + (parseFloat(load_travel_time)/3600);
+				empty_travel[pos] = parseFloat(empty_travel[pos]) + (parseFloat(empty_travel_time)/3600);
+				loading[pos] = parseFloat(loading[pos]) + (parseFloat(loading_time)/3600);
+				stopped_loaded[pos] = parseFloat(stopped_loaded[pos]) + (parseFloat(stopped_time_loaded)/3600);
+				stopped_empty[pos] = parseFloat(stopped_empty[pos]) + (parseFloat(stopped_time_loaded)/3600);
+				
+	           
+
+	        } else { //si no existe creamos la fila perteniente a esa zona
+				
+	            auxdumper.push(name_dumper);
+	            load_travel.push(parseFloat(load_travel_time)/3600);
+				empty_travel.push(parseFloat(empty_travel_time)/3600);
+				loading.push((parseFloat(loading_time)/3600));
+				stopped_loaded.push(parseFloat(stopped_time_loaded)/3600);
+				stopped_empty.push(parseFloat(stopped_time_loaded)/3600);
+
+	        }
+
+
+
+
+    }
+
+
+        plot = $.jqplot('grafico3', [load_travel, empty_travel, loading, stopped_loaded, stopped_empty], {
+            
+            title: 'Dumpers Cycle time distribution',			
+			stackSeries: true,
+            captureRightClick: true,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                shadowAngle: 135,
+                rendererOptions: {
+                    barDirection: 'vertical',
+                    highlightMouseDown: true ,
+                    barWidth: 100						
+                },
+                pointLabels: {show: false, formatString: '%d'}
+            },
+            legend: {
+                show: true,
+                location: 'e',
+                placement: 'outside',
+				labels:['Load Travel Time','Empty Travel Time','Loading Time','Stopped Time Loaded','Stopped Time Empty']
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+					ticks:auxdumper,
+					label: 'Dumpers'
+                },
+				yaxis: {
+                    
+					label: 'Time in hours',
+					labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+                }
+				
+            }
+        });
+ 
+
+	}	
+	
+    function statistics_loaders(valores) {
+
+		$('#grafico3').empty(); //Borramos el grafico por si hubiese algun grafico previo
+            $("#grafico3").show(); //hacemos visible el grafico
+		
+	    var auxloader = []; //variable auxiliar para localziar los dumpers	    
+	 
+	   
+		var load_travel = [];
+		var empty_travel = [];
+		var loading = [];
+		var stopped_loaded = [];
+		var stopped_empty = [];
+		
+	    // recorremos los valores devueltos por la base de datos y creamos un array con una fila por cada zona con sus coordendas y su carga total
+	    for (var i = 0; i < valores.length; i++) {
+			//alert(valores.length);
+	        //obtenemos las zonas
+	        var loader_name = (valores[i]["loader"]);
+	       
+			
+			//obtenemos los tiempos
+			
+			var loading_time = (valores[i]["Load_time"]);
+			
+			
+	      
+	        //comprobamos si existe la zona 
+
+	        if (auxloader.contains(loader_name)) { //si existe le sumamos la carga
+				
+	            var pos = auxloader.indexOf(loader_name);
+	           
+				loading[pos] = parseFloat(loading[pos]) + (parseFloat(loading_time)/60);
+				
+				
+	           
+
+	        } else { //si no existe creamos la fila perteniente a esa zona
+				
+	            auxloader.push(loader_name);
+	           
+				loading.push((parseFloat(loading_time)/60));
+			
+	        }
+
+		
+
+
+
+    }
+
+
+        plot = $.jqplot('grafico3', [loading], {
+            title: 'Loaders loading time',
+			stackSeries: true,
+            captureRightClick: true,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                shadowAngle: 135,
+                rendererOptions: {
+                    barDirection: 'vertical',
+                    highlightMouseDown: true ,
+                    barWidth: 100					
+                },
+                pointLabels: {show: true}
+            },
+            legend: {
+                show: false,
+               
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+					ticks:auxloader,
+					label: 'Loaders'
+                },
+				yaxis: {
+                    
+					label: 'Loading Time (minutes)',
+					
+					labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+					angle: 270
+                }
+				
+            }
+        });
+			  
+
+	}	
+		
+        //Funcion para guardar la imagen
+        function saveimage(grafico) {
+
+            var imgelem = $(grafico).jqplotToImageCanvas(); //Pasamos el grafico a canvas
+
+            imgelem.toBlobHD(function(blob) {
+                saveAs(blob, "Graphic.png");
+            }, "image/png");
+
+
+        }
+
+
+        function createpdf(grafico) {
+
+
+            var imgelem = $(grafico).jqplotToImageElem();
+            var imageSrc = imgelem.src; // this stores the base64 image url in imagesrc
+            //var imglogo =  'img/logo2.png';
+            var doc = new jsPDF('landscape');
+            doc.setFontSize(27);
+            doc.text(120, 30, "STADISTICS");
+            //doc.addImage(imagelogo, 'png', 10, 10);
+            doc.addImage(imageSrc, 'png', 17, 60);
+            doc.save('Statistics.pdf');
+
+
+            //open(imageSrc); // this will open the image in another tab
+            //var file = new File([imageSrc], "Graphic.png", {type: "image/png"});
+            //saveAs(file);
+
+
+        }
+
+        //Llamada a los metodos del drowdown
+
+        //Production
+        jQuery("#action1-1").click(function(e) {
+
+            timeperzone(valores, 'Load');
+
+        });
+
+        jQuery("#action1-2").click(function(e) {
+
+            timeperzone(valores, 'Dump');
+
+        });
+        jQuery("#action1-3").click(function(e) {
+
+            payloadperzone(valores, 'Load');
+
+        });
+
+        jQuery("#action1-4").click(function(e) {
+
+            payloadperzone(valores, 'Dump');
+
+        });
+
+
+        //Potential for improvement
+        jQuery("#action2-1").click(function(e) {
+
+            cycletime(valores);
+
+        });
+
+        jQuery("#action2-2").click(function(e) {
+
+            stoptimeempty(valores);
+
+        });
+
+        jQuery("#action2-3").click(function(e) {
+
+            stoptimeload(valores);
+
+
+        });
+
+        jQuery("#action2-4").click(function(e) {
+
+            traveltimeempty(valores);
+
+        });
+
+        jQuery("#action2-5").click(function(e) {
+
+            traveltimeload(valores);
+
+
+        });
+
+        jQuery("#action2-6").click(function(e) {
+
+            loadtime(valores);
+
+        });
+
+		jQuery("#action3-1").click(function(e) {
+
+            statistics_dumpers(valores);
+
+
+        });
+
+        jQuery("#action3-2").click(function(e) {
+
+            statistics_loaders(valores);
+
+        });
+		
+        $(window).resize(function() {
+            plot.replot({
+                resetAxes: true
+            });
+        });
+
+        //Llamada al primer metodo de cada pagina cuando se cambia la pagina
+        /*$('.nav-tabs a').click(function(){
+            alert("caca");
+        })*/
+    </script>
+
+
+
+</body>
+
+</html>

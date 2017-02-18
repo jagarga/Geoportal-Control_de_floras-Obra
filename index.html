@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Bergerat</title>
+	
+	
+      <link href="CSS/ol.css" rel="stylesheet">
+	  <link href="CSS/mystyles.css" rel="stylesheet">
+	  <link href="CSS/radiobutton.css" rel="stylesheet">
+	  <link href="CSS/bootstrap.min.css" rel="stylesheet">
+      <link href="CSS/bootstrap-theme.min.css" rel="stylesheet">
+	  <link href="CSS/bootstrap-datetimepicker.min.css" rel="stylesheet">
+      <link href="CSS/font-awesome.min.css" rel="stylesheet">
+      <link href="CSS/bootstrap-social.css" rel="stylesheet">
+	  <link href="CSS/ol3-popup.css" rel="stylesheet" />
+	  <link rel="stylesheet" type="text/css" href="CSS/jquery.jqplot.css" />
+	  <link rel="stylesheet" href="CSS/ol3gm.css" type="text/css" />
+	  
+	  
+
+       <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	  
+	  <!-- jqplot, to mae plots and graphs -->
+	  <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js"></script>
+	  <script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script>
+	  <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.barRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.categoryAxisRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.pieRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.pointLabels.js"></script>
+	  <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.canvasAxisTickRenderer.js"></script>
+	  <script language="javascript" type="text/javascript" src="js/jqplot/jqplot.canvasTextRenderer.js"></script>
+
+      <!-- Latest compiled and minified JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+      <!-- bootstrap timpicker para la fecha -->
+	  <script src="js/moments.js"></script>
+	  <script src="js/bootstrap-datetimepicker.min.js"></script>
+	  <!--  Openlayers 3 -->
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.17.1/ol.js"></script>
+	  <script src="js/ol3-popup.js"></script>
+	  <!--  Proj4 -->
+	  <script src="js/proj4.js"></script>
+	  <!--  Libreria ol3-contextmenu para hacer un dialogo con el click derecho-->
+	  <link href="//cdn.jsdelivr.net/openlayers.contextmenu/latest/ol3-contextmenu.min.css" rel="stylesheet">
+      <script src="//cdn.jsdelivr.net/openlayers.contextmenu/latest/ol3-contextmenu.js"></script>
+	   <!-- script para conectar con la base de datos -->
+	  <script src="Databaseconnection.js"></script>
+	   <!-- script de funciones externas -->
+	  <script src="Functions.js"></script>
+	  <!-- script de funciones externas -->
+	  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyDHJPLo3ksbkEyjJkslA66zEH46op8M_7A"></script>
+      <script src="js/ol3gm.js"></script>
+	   
+      <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css" type="text/css" media="screen" />
+	  
+	<style type="text/css">
+
+    </style>
+
+  </head>
+  <body>
+  
+    <div class="container">
+      <nav class="navbar navbar-fixed-top navbar-default" role="navigation">
+        <div class="container-fluid">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="pull" href="#"><img src="img/logo.png" height=52 width=160></a>
+			<!--<a class="navbar-brand myLogo" href="#"><img src="img/logo.png" height=50 width=140></a>-->
+          </div>
+
+		  
+            </div><!-- /.container-fluid -->
+          </nav>
+        </div>
+      </nav>
+      <div class="navbar-offset"></div>
+      <div id="map" class="map"></div>
+      </div>
+	  <!--Gestor de capas-->
+      <div class="row main-row">
+        <div class="col-sm-4 col-md-3 sidebar sidebar-right pull-right">
+          <div class="panel-group sidebar-body" id="accordion-left">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#layers">
+                    <i class="fa fa-list-alt"></i>
+                    Layers
+                  </a>
+                  <span class="pull-right slide-submenu">
+                    <i class="fa fa-chevron-left"></i>
+                  </span>
+                </h4>
+              </div>
+              <div id="layers" class="panel-collapse collapse in">
+                <div class="panel-body list-group">
+				  <div id="layersradio" class="funkyradio">
+<div class='panel panel-default'><header class='panel-heading'>BaseLayers</header></div>
+<div class='funkyradio-default'><input type='radio' name='radio' value='Google Satellite' checked ><label> Google Satellite</label></div>
+				  </div>
+				  <div id="overlaysradio" class="funkyradio">
+
+				  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+		
+		<!--Gestor de periodos-->
+        <div class="col-sm-4 col-md-3 sidebar sidebar-left pull-left">
+
+          <div class="panel-group sidebar-body" id="accordion-right">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#taskpane">
+                    <i class="fa fa-tasks"></i>
+                    Time Period
+                  </a>
+                  <span class="pull-right slide-submenu">
+                    <i class="fa fa-chevron-right"></i>
+                  </span>
+                </h4>
+              </div>
+              <div id="taskpane" class="panel-collapse collapse in">
+                <div class="panel-body">
+
+<!--Tiempo-->				
+  <div class="row main-row">
+    <div class='col-md-12'>
+	<h4>Start</h4>
+        <div class="form-group">
+            <div class='input-group date' id='datetimepicker6'>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class='col-md-12'>
+	<h4>End</h4>
+        <div class="form-group">
+            <div class='input-group date' id='datetimepicker7'>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+  </div>
+<script type="text/javascript">
+
+    $(function () {
+
+	
+	//funcion a realizar cada vez que se hace un cambio de fecha
+	
+	//fijamos la hora inicial
+	var timeinicial = new Date();
+	timeinicial.setDate(timeinicial.getDate()-1);
+    timeinicial.setHours(12);
+	timeinicial.setMinutes(0);
+	
+	var timeinicial2 = new Date();
+	timeinicial2.setDate(timeinicial2.getDate()-1);
+	timeinicial2.setHours(24);
+	timeinicial2.setMinutes(0);
+	
+	//Pasamos los datos del time inicial a las variables de tiempo por si el usuario usa las fechas por defecto
+	timeopen = timeinicial;
+	timefinish = timeinicial2;
+	
+        $('#datetimepicker6').datetimepicker({
+		    sideBySide: true,
+			showTodayButton: true,
+			defaultDate: timeinicial
+		});
+        $('#datetimepicker7').datetimepicker({
+            useCurrent: false, //Important! See issue #1075
+			sideBySide: true,
+			defaultDate: timeinicial2
+        });
+
+        $("#datetimepicker6").on("dp.change", function (e) {
+            $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+		
+		//Obtenemos la fecha
+		var time = (e.date).toDate();	
+		//La formateamos con el formato de la base de datos
+		timeopen = (time.getFullYear()) + '-' + (time.getMonth() + 1) + '-' + (time.getDate()) + ' ' + (time.getHours()) + ':' + (time.getMinutes()) ;
+			
+			
+        });
+		
+        $("#datetimepicker7").on("dp.change", function (e) {
+            $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+			
+		//Obtenemos la fecha
+		var time2 = (e.date).toDate();	
+		//La formateamos con el formato de la base de datos
+		timefinish = (time2.getFullYear()) + '-' + (time2.getMonth() + 1) + '-' + (time2.getDate()) + ' ' + (time2.getHours()) + ':' + (time2.getMinutes()) ;
+
+		//Activamos el grupo de botones para gestionar los datos
+		/*$('#data1').removeAttr("disabled");
+		$('#data2').removeAttr("disabled");
+		$('#data3').removeAttr("disabled");  */
+			
+        });
+		
+    });
+</script>
+
+<!--  
+    <div class="funkyradio">
+        <div class="funkyradio-primary">
+            <input type="checkbox" name="checkbox" id="checkbox1" checked/>
+            <label for="checkbox1">Loaded Payloads</label>
+        </div>
+        <div class="funkyradio-primary">
+            <input type="checkbox" name="checkbox" id="checkbox2" checked/>
+            <label for="checkbox2">Load Flow</label>
+        </div>
+        <div class="funkyradio-primary">
+            <input type="checkbox" name="checkbox" id="checkbox3" checked/>
+            <label for="checkbox3">Dumpers Payloads</label>
+        </div>
+    </div> </br>
+-->
+
+<div class="btn-group btn-group-justified" role="group" aria-label="...">
+  <div class="btn-group" role="group">
+    <button id= "data1" type="button" class="btn btn-default" onclick="valores = query(timeopen,timefinish); map.removeLayer(production); production = display(map, production, valores);">Display data</button>
+  </div>
+  <div class="btn-group" role="group">
+ <button id= "data2" type="button" class="btn btn-default" onclick="valoresseleccionados = query(timeopen,timefinish); window.open('Statistics.html?pagina=4');">Graphics</button>
+ </div>
+  <div class="btn-group" role="group">
+    <button id= "data3" type="button" class="btn btn-default" onclick=" window.open('Showdata.html?timeopen=' + timeopen  + '&timefinish=' +  timefinish); ">Show data</button>
+  </div>
+</div>
+				
+				
+                </div>
+              </div>
+            </div>
+			   <div class="well well-sm" id="intervalo" hidden> </div>
+          </div>
+		  
+        </div>
+		
+		        <div class="col-sm-4 col-md-6 mid">
+
+		</div>
+		<div id="btngrp_2" class="btn-group pull">
+            <a id="zoom_prev" class="btn btn-default navbar-btn" disabled="false" onclick="before(map);"><i class="icon-reply"></i></a>
+            <a id="zoom_next" class="btn btn-default navbar-btn" disabled="false" onclick="after(map);"><i class="icon-share-alt"></i></a>
+			<a id="zoom_out" class="btn btn-default navbar-btn" title="Zoom out" onclick="zoomless(map);"><i class="icon-zoom-out"></i></a>
+            <a id="zoom_in" class="btn btn-default navbar-btn" title="Zoom in" onclick="zoomplus(map);"><i class="icon-zoom-in"></i></a>         
+        </div>
+      </div>
+      <div class="mini-submenu mini-submenu-left pull-left">
+        <i class="fa fa-list-alt"></i>
+      </div>
+	  
+      <div class="mini-submenu mini-submenu-right pull-right">
+        <i class="fa fa-tasks"></i>
+      </div>
+
+    </div>
+	
+	
+	
+	    <script type="text/javascript">
+
+	//Variables Globales
+	var map; //variable mapa
+	var currentlayer; //variable para almacenar la capa anterior para desactivarla
+	var currentoverlaylayer; //variable para almacenar la capa anterior para desactivarla
+	var Baselayers; //Variable para almacenar el grupo de capas base
+	var production; //Variable para almacenar el grupo de capas de produccion
+	var zoomhistory = []; //Variables para almacenar el historial de zoom
+	var centerhistory = []; //Variables para almacenar el historial del centro
+	var zoomhistorynext = []; //Variables para almacenar el historial siguiente de zoom
+	var centerhistorynext = []; //Variables para almacenar el historial siguiente del centro
+	
+	var valores; //Resultado de la peticion a la abse de datos;
+	var valoresseleccionados;
+	var zones; //Resultado de la peticion a la abse de datos;
+	
+	
+	//Variables globales para acceder a la base de datos
+	var timeopen = null;
+	var timefinish = null;
+	
+	//Variables globales para cargar la capa de Google
+	var olGM
+    //Variable para almacenar el tipo de capa, si es de zona o de movimiento
+	var tipo;
+
+
+
+//timeopen = (time.getFullYear()) + '-' + (time.getMonth() + 1) + '-' + (time.getDate()) + ' ' + (time.getHours()) + ':' + (time.getMinutes()) ;
+	
+	
+	
+	
+	//FUNCIONES PARA CONTROLAR EL GESTOR DE CAPAS
+	
+		//funcion para añadir las capas overlay al gestor de capas
+	function gestorcapasoverlays(layersgroup) {
+	  
+	  $("#overlaysradio").empty(); //vaciamos el div por si ya hubiesemos cargado alguna capa anteriormente
+	  
+				var layers = layersgroup.getLayers();
+                var length = layers.getLength(), l;
+				currentoverlaylayer = layers.item(0); //iniciamos como capa actual la unica seleccionada
+				var capas = "<div name='paneldecapas' class='panel panel-default'><header class='panel-heading'>" +  layersgroup.get('name') + "</header></div>  ";
+				$( "#overlaysradio" ).append(capas);
+				
+				var ancho = $('div[name=paneldecapas]').width();  //Obtenemos el ancho del gestor de capas para poner elmismo a la leyenda
+				
+				//recorremos todas las capas y las añadimos al gestor en un radiobutton de bootstrap
+                for (var i = 0; i < length; i++) {
+				
+                    l = layers.item(i);
+					var color = l.get('color');
+
+						 //capas = capas + "<input type='checkbox' name='fancy-checkbox-default' id='fancy-checkbox-default' autocomplete='off' />   <div class='[ btn-group ]'>    <label for='fancy-checkbox-default' class='[ btn btn-default ]'>    <div class='[ btn-group ]'>     <label for='fancy-checkbox-default' class='[ btn btn-default ]'><span class='[ glyphicon glyphicon-ok ]'></span><span> </span>  </label>   <label for='fancy-checkbox-default' class='[ btn btn-default active ]'>   Default Checkbox   </label></div></div>   ";
+				
+						 capas = "<div class='funkyradio-default'><input type='checkbox' name='check' autocomplete='off' checked value='" + l.get('name') + "' onclick='changeoverlaylayer(this, production);' id='check" + i + "' /><label for='check" + i + "'> <canvas id='leyenda" + i + "'  width='30' height='20' style='margin-right:5px;' > </canvas>" + l.get('name') + "   </label></div>";
+                        $( "#overlaysradio" ).append(capas);
+					    draw('leyenda' + i, ancho, color); //llamada a la funcion que dibuja el simbolo de leyenda de cada capa
+                }
+
+	  
+	  }
+	  
+	  	  //Funcion para cambiar la capa overlay del radiobutton
+	  function changeoverlaylayer(layer, layersgroup) {
+ 
+	    for (var i=0;i<layersgroup.getLayers().getLength();i++) {
+		
+           if (layersgroup.getLayers().getArray()[i].get('name') === layer.value) { //check if layer exists
+
+		     if ( layersgroup.getLayers().getArray()[i].getVisible()==false  ){
+		  
+		       layersgroup.getLayers().getArray()[i].setVisible(true);
+		  
+		     }else{
+		  
+		       layersgroup.getLayers().getArray()[i].setVisible(false);
+		  
+		     }
+		  
+           }
+        }
+	  
+	  }
+	
+
+	//funcion para añadir las capas base al gestor de capas
+	  function gestorcapas(layersgroup) {
+	  
+	            //var layers = map.getLayers();
+				var layers = layersgroup.getLayers();
+                var length = layers.getLength(), l;
+				currentlayer = layers.item(0); //iniciamos como capa actual la unica seleccionada
+				var capas = "<div class='panel panel-default'><header class='panel-heading'>" +  layersgroup.get('name') + "</header></div>";
+				//    "<div class='funkyradio-default'><input type='radio' name='radio' value='Google Satellite' onChange='olGM.toggle();'  /><label> Google Satellite</label></div>"
+				//var capas = "<span class='label label-default'>" +  Baselayers.get('name') + "</span>";
+				//recorremos todas las capas y las añadimos al gestor en un radiobutton de bootstrap
+                for (var i = 0; i < length; i++) {
+                    l = layers.item(i);
+					
+					if (i==0){
+						 capas = capas + "<div class='funkyradio-default'><input type='radio' name='radio' value='" + l.get('name') + "' onclick='changelayer(this, Baselayers);' id='radio" + i + "' checked /><label for='radio" + i + "'> " + l.get('name') + "</label></div>";
+					} else if (i==(length-1)) {					
+						 capas = capas + "<div class='funkyradio-default'><input type='radio' name='radio' value='" + l.get('name') + "' onclick='changelayer(this, Baselayers);' id='radio" + i + "' /><label for='radio" + i + "'> " + l.get('name') + "</label></div>";
+					} else {
+                         capas = capas + "<div class='funkyradio-default'><input type='radio' name='radio' value='" + l.get('name') + "' onclick='changelayer(this ,Baselayers);' id='radio" + i + "' /><label for='radio" + i + "'> " + l.get('name') + "</label></div>";
+                    }					
+                }
+				$( "#layersradio" ).append(capas);
+	  
+	  }
+	  
+	  //Funcion para cambiar la capa base del radiobutton
+	  function changelayer(layer, layersgroup) {
+	  
+
+	    for (var i=0;i<layersgroup.getLayers().getLength();i++) {
+		
+          if (layersgroup.getLayers().getArray()[i].get('name') === layer.value) { //check if layer exists
+              layersgroup.getLayers().item(i).setVisible(true);
+			  currentlayer.setVisible(false);
+			  currentlayer = layersgroup.getLayers().item(i);
+          } else {
+
+		  }
+        }
+	  
+	  }
+	  
+	  
+	  
+	  
+	  //CONTROLES PERSONALIZADOS
+	  
+	  function zoomplus(map) {
+	  
+	  		var view = map.getView();
+            var newResolution = view.constrainResolution(view.getResolution(), 1);
+            view.setResolution(newResolution);
+	  
+	  }
+	  
+	  function zoomless(map) {
+	  
+	  		var view = map.getView();
+            var newResolution = view.constrainResolution(view.getResolution(), -1);
+            view.setResolution(newResolution);
+	  
+	  }
+	  
+	  //Funcion para volver atras en el historial
+	  function before(map) {
+	  
+	   if(centerhistory.length!=1 || zoomhistory.length!=1) { //para bloquear que se llame a la funcion si no hay nada en el historial
+
+	  		var view = map.getView();
+			//Guardamos el zoom y el centro anterior en el array para volver adelante
+			centerhistorynext.push(centerhistory[(centerhistory.length)-1]);
+			zoomhistorynext.push(zoomhistory[(zoomhistory.length)-1]);
+			//Obtenemos el nuevo centro y el nuevo zoom
+			var currentcenter = centerhistory[(centerhistory.length)-2];
+			var currentzoom = zoomhistory[(zoomhistory.length)-2];
+			//borramos el ultimo elemento la hacer zoom para atras
+			centerhistory.pop(); 
+			zoomhistory.pop();
+			centerhistory.pop(); 
+			zoomhistory.pop();
+			//centramos y hacemos zoom
+			view.setCenter(currentcenter);
+			view.setZoom(currentzoom);
+			
+			}
+	  
+	  }
+	  
+	  //Funcion para volver adelante en el historial
+	  function after(map) {
+	  
+	   if(centerhistorynext.length!=0 || zoomhistorynext.length!=0) { //para bloquear que se llame a la funcion si no hay nada en el historial
+
+	  		var view = map.getView();
+			//Obtenemos el nuevo centro y el nuevo zoom
+			var currentcenter = centerhistorynext[0];
+			var currentzoom = zoomhistorynext[0];
+			//borramos el primer elemento a hacer zoom para alante
+			centerhistorynext.shift(); 
+			zoomhistorynext.shift();
+
+			//centramos y hacemos zoom
+			view.setCenter(currentcenter);
+			view.setZoom(currentzoom);
+			
+			}
+	  
+	  }
+	  
+	
+      function applyMargins() {
+        var leftToggler = $(".mini-submenu-left");
+        var rightToggler = $(".mini-submenu-right");
+        if (leftToggler.is(":visible")) {
+          //$("#map .ol-zoom")
+          //  .css("margin-left", 0)
+          //  .removeClass("zoom-top-opened-sidebar")
+          //  .addClass("zoom-top-collapsed");
+		  $("#btngrp_2")
+            .css("margin-left", 75);			
+        } else {
+          //$("#map .ol-zoom")
+          //  .css("margin-left", $(".sidebar-left").width())
+          //  .removeClass("zoom-top-opened-sidebar")
+          //  .removeClass("zoom-top-collapsed");
+		  $("#btngrp_2")
+            .css("margin-left", 5);
+        }
+        if (rightToggler.is(":visible")) {
+          $("#map .ol-rotate")
+            .css("margin-right", 0)
+            .removeClass("zoom-top-opened-sidebar")
+            .addClass("zoom-top-collapsed");
+
+        } else {
+          $("#map .ol-rotate")
+            .css("margin-right", $(".sidebar-right").width())
+            .removeClass("zoom-top-opened-sidebar")
+            .removeClass("zoom-top-collapsed");
+        }
+      }
+
+      function isConstrained() {
+        return $("div.mid").width() == $(window).width();
+      }
+
+      function applyInitialUIState() {  //Estado inicial de los paneles (escondidos o visibles)
+	      $(".sidebar-left .sidebar-body").fadeOut();
+          $(".sidebar-right .sidebar-body").fadeIn('slide');
+          $('.mini-submenu-left').fadeIn('slide');
+          $('.mini-submenu-right').fadeOut();
+        if (isConstrained()) {
+          $(".sidebar-left .sidebar-body").fadeOut('slide');
+          $(".sidebar-right .sidebar-body").fadeOut('slide');
+          $('.mini-submenu-left').fadeIn();
+          $('.mini-submenu-right').fadeIn();
+        }
+      }
+
+      $(function(){
+        $('.sidebar-left .slide-submenu').on('click',function() {
+          var thisEl = $(this);
+          thisEl.closest('.sidebar-body').fadeOut('slide',function(){
+            $('.mini-submenu-left').fadeIn();
+            applyMargins();
+          });
+        });
+
+        $('.mini-submenu-left').on('click',function() {
+          var thisEl = $(this);
+          $('.sidebar-left .sidebar-body').toggle('slide');
+          thisEl.hide();
+          applyMargins();
+        });
+
+        $('.sidebar-right .slide-submenu').on('click',function() {
+          var thisEl = $(this);
+          thisEl.closest('.sidebar-body').fadeOut('slide',function(){
+            $('.mini-submenu-right').fadeIn();
+            applyMargins();
+          });
+        });
+
+        $('.mini-submenu-right').on('click',function() {
+          var thisEl = $(this);
+          $('.sidebar-right .sidebar-body').toggle('slide');
+          thisEl.hide();
+          applyMargins();
+        });
+
+        $(window).on("resize", applyMargins);
+		
+		    // Create layers instances
+            var layerOSM = new ol.layer.Tile({
+                source: new ol.source.OSM(),
+                name: 'OpenStreetMap',
+				visible: false,
+            });
+			
+			
+			var layerBingaereo = new ol.layer.Tile({
+                visible: true,
+                preload: Infinity,
+				name: 'Terrestrial BingMaps',
+                source: new ol.source.BingMaps({
+                  key: 'AkGbxXx6tDWf1swIhPJyoAVp06H0s0gDTYslNWWHZ6RoPqMpB9ld5FY1WutX8UoF',
+                  imagerySet: 'Aerial'
+                  // use maxZoom 19 to see stretched tiles instead of the BingMaps
+                  // "no photos at this zoom level" tiles
+                  // maxZoom: 19
+                })
+             });
+			 
+			var layerBingaereoetiquetas = new ol.layer.Tile({
+                visible: false,
+                preload: Infinity,
+				name: 'Terrestrial BingMaps with labels',
+                source: new ol.source.BingMaps({
+                  key: 'AkGbxXx6tDWf1swIhPJyoAVp06H0s0gDTYslNWWHZ6RoPqMpB9ld5FY1WutX8UoF',
+                  imagerySet: 'AerialWithLabels'
+                  // use maxZoom 19 to see stretched tiles instead of the BingMaps
+                  // "no photos at this zoom level" tiles
+                  // maxZoom: 19
+                })
+             });
+			 			 
+			 
+			var layerBingmaps = new ol.layer.Tile({
+                visible: false,
+                preload: Infinity,
+				name: 'BingMaps',
+                source: new ol.source.BingMaps({
+                  key: 'AkGbxXx6tDWf1swIhPJyoAVp06H0s0gDTYslNWWHZ6RoPqMpB9ld5FY1WutX8UoF',
+                  imagerySet: 'Road'
+                })
+             });
+			 
+			   var googleLayer = new olgm.layer.Google({
+    mapTypeId: google.maps.MapTypeId.SATELLITE
+  });
+			 
+			Baselayers = new ol.layer.Group({
+                layers: [layerBingaereo, layerBingaereoetiquetas, layerBingmaps],
+                name: 'BaseLayers'
+            });
+			
+
+
+  map = new ol.Map({
+  // use OL3-Google-Maps recommended default interactions
+  interactions: olgm.interaction.defaults({doubleClickZoom :false}),
+  controls: [],
+  layers: [
+     googleLayer
+  ],
+          // Improve user experience by loading tiles while animating. Will make
+        // animations stutter on mobile or slow devices.
+        loadTilesWhileAnimating: true,  //Para los zooms animados
+  target: 'map',
+  view: new ol.View({
+			projection: 'EPSG:3857',
+            center: [413561, 5631080],
+            zoom: 4,
+			maxZoom: 20
+  })
+});
+
+
+olGM = new olgm.OLGoogleMaps({map: map}); // map is the ol.Map instance
+olGM.activate();
+
+		//Evento para guardar en cada movimiento el zoom y el centro en un historial
+		map.on('moveend', function() {
+		//para activar o desactivar el boton de zoom para atras
+		if(zoomhistory.length==1 || centerhistory.length==1){ //activamos el boton
+		  $('#zoom_prev').removeAttr("disabled");
+		} else if (zoomhistory.length==0 || centerhistory.length==0) {
+		  $('#zoom_prev').attr('disabled','disabled');
+		}	
+
+		//para activar o desactivar el boton de zoom para alante
+		if(zoomhistorynext.length==1 || centerhistorynext.length==1){ //activamos el boton
+		  $('#zoom_next').removeAttr("disabled");
+		} else if (zoomhistorynext.length==0 || centerhistorynext.length==0) {
+		  $('#zoom_next').attr('disabled','disabled');
+		}			
+		
+		  var view = map.getView();
+          var zoom = view.getZoom();
+		  var center = view.getCenter();
+          zoomhistory.push(zoom);
+		  centerhistory.push(center);
+		  	  
+        });
+		
+		//gestorcapas(Baselayers); //Llamamos funcion que crea el gestor de capas
+        applyInitialUIState();
+        applyMargins();
+		
+		//production = display(map,production);   
+        		
+
+      });
+    </script>
+	
+	
+	
+	
+  </body>
+</html>

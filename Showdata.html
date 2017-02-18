@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>Data</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <style> </style>
+		    <script src="http://code.jquery.com/jquery-1.11.3.min.js" type="text/javascript"></script>
+	<link href="CSS/bootstrap.min.css" rel="stylesheet">
+	<link href="CSS/mystyles.css" rel="stylesheet">
+
+	     <!-- Latest compiled and minified JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	   <!-- script de funciones externas -->
+
+	  <!-- Librerias para exportar tabla bootstrap a excel -->
+<link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
+<script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+<script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/jszip.min.js"></script>
+
+    <!-- Filesaver to save files -->
+    <script language="javascript" type="text/javascript" src="https://cdn.rawgit.com/eligrey/Blob.js/0cef2746414269b16834878a8abc52eb9d53e6bd/Blob.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+
+
+    <!-- JSPDF to export to pdf files -->
+    <script language="javascript" type="text/javascript" src="js/jspdf/jspdf.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/addimage.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/png_support.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/png.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/zlib.js"></script>
+	<script language="javascript" type="text/javascript" src="js/jspdf/jspdf.plugin.autotable.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jspdf/faker.min.js"></script>
+	<script language="javascript" type="text/javascript" src="js/jspdf/split_text_to_size.js"></script>
+	<script language="javascript" type="text/javascript" src="js/jspdf/standard_fonts_metrics.js"></script>
+	
+</head>
+<body style= "padding:10px">
+
+
+    <ul class="nav nav-tabs" role="tablist" id="tabs">
+        <li role="presentation" class="active" id="menu1"><a href="#Data" aria-controls="Data" role="tab" data-toggle="tab">Data</a></li>
+        <li role="presentation" id="menu2"><a href="#hourly" aria-controls="hourly" role="tab" data-toggle="tab">Hourly Production</a></li>
+        <li role="presentation" id="menu3"><a href="#alerts" aria-controls="alerts" role="tab" data-toggle="tab">Alerts</a></li>
+    </ul>
+
+
+<div id="tabcontent" class="tab-content">
+
+            </br>
+            <div class="btn-group">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Download <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" id="action1">Export to Excel</a></li>
+                    <li><a href="#" id="action2">Export to PDF</a></li>
+                </ul>
+            </div>
+            </br>
+
+  <div role="tabpanel"  id="Data" class="tab-pane fade in active" style= "height: 600px !important; overflow: scroll; padding-top:20px">
+  <table id="excelDataTable" border="1" class="table table-striped" ></table> 
+  </div>
+  
+  
+  <div role="tabpanel"  id="hourly" class="tab-pane fade" style= "height: 600px !important; overflow: scroll; padding-top:20px">
+<table id="excelDataTable2" border="1" class="table table-striped" ></table> 
+  </div>
+  
+  
+  <div role="tabpanel"  id="alerts" class="tab-pane fade" style= "height: 600px !important; overflow: scroll; padding-top:20px">
+<table id="excelDataTable3" border="1" class="table table-striped" ></table> 
+  </div>
+  
+  
+</div>
+
+
+   
+    <script type="text/javascript">
+var valores;
+var timeopen = getParameter('timeopen');  //recibimos el tiempo pasado como entrada
+var timefinish = getParameter('timefinish');  //recibimos el tiempo pasado como entrada
+var tabla = "#excelDataTable"; //variable para elegir la tabla dodne deplegar los datos
+			
+		 //Llamada al primer metodo de cada pagina cuando se cambia la pagina
+		$('#menu1').click(function(){
+            //buildHtmlTable(valores, "#excelDataTable");
+        })
+		 	 
+        $('#menu2').click(function(){
+            hourly(valores);
+        })
+		
+		$('#menu3').click(function(){
+            alerts(valores)
+        })
+
+
+
+//Funcion que muestra los datos agrupados por horas		
+function hourly(valores) {
+
+var auxhoras = []; //variable auxiliar para guardar las horas para que no se repitan
+var hourvalores = [];//Variable para guardar los datos organizados por horas
+tabla = "#excelDataTable2";
+
+//Recorremos todos los valores y mediante la variable auxiliar de horas si una hora esta repetida sumamos sus campos si no se crea un registro nuevo
+    for (var i = 0; i < valores.length; i++) {
+
+
+            var hora = (valores[i]["Date"]);
+		 	var zoneorigin = (valores[i]["Origin"]);
+	        var zonedestin = (valores[i]["Destination"]);
+			var cycletime = (valores[i]["Cycle_time"]);
+			var payload = (valores[i]["Payload"]).replace(",", ".");
+
+
+	        //comprobamos si existe esa hora
+
+	        if (auxhoras.indexOf(hora)!='-1') { //si existe le sumamos la carga y demas datos
+
+	            var pos = auxhoras.indexOf(hora);
+
+				hourvalores[pos][3] = parseInt(hourvalores[pos][3]) + parseInt(cycletime);
+				hourvalores[pos][4] = parseFloat(hourvalores[pos][4]) + parseFloat(payload);
+
+				hourvalores[pos][1] = hourvalores[pos][1] + ',' + zoneorigin ;	
+				hourvalores[pos][2] = hourvalores[pos][2] + ',' + zonedestin ;
+
+	        } else { //si no existe creamos la fila nueva perteniente a esa hora
+
+	            auxhoras.push(hora);
+	            hourvalores.push([hora, zoneorigin, zonedestin, cycletime, payload]);
+
+	        }
+
+}
+
+//For para recorrer los datos y quitar las zonas repetidas de cada hora
+for (var i = 0; i < hourvalores.length; i++) {
+
+var origenes = (hourvalores[i][1]).split(",");  //Creamos un array con todas las zonas de cada fila
+var destinos = (hourvalores[i][2]).split(","); 
+var ori = ' ';
+var desti = ' ';
+var auxzones = []; //variable auxiliar para localizar la posicion de la zona
+var auxzones2 = [];
+
+  for (var j = 0; j < origenes.length; j++) {
+  
+     if (auxzones.indexOf(origenes[j])!='-1') { 
+	 
+	 
+	 } else {
+	 
+	 auxzones.push(origenes[j]);
+	 if(j==0){
+	 ori = origenes[j];
+	 } else {
+	 ori = origenes[j] + ' / ' + ori;
+	 } 
+	 }
+    
+  }
+
+
+  for (var j = 0; j < destinos.length; j++) {
+  
+       if (auxzones2.indexOf(destinos[j])!='-1') { 
+	 
+	 
+	 } else {
+	 
+	 auxzones2.push(destinos[j]);
+	 
+	 if(j==0){
+	 desti = destinos[j];
+	 } else {
+	 desti = destinos[j] + ' / ' + desti;
+	 }
+	 
+	 }
+  
+  }
+  
+  hourvalores[i][1] = ori
+  hourvalores[i][2] = desti
+}
+
+
+var obj = hourvalores;
+//Renonmbramos las columnas
+for (var i = 0; i <  obj.length; i++) {
+
+obj[i].Time = obj[i][0];
+delete obj[i][0];
+obj[i].Origin = obj[i][1];
+delete obj[i][1];
+obj[i].Destination = obj[i][2];
+delete obj[i][2];
+obj[i].CycleTime = obj[i][3];
+delete obj[i][3];
+obj[i].Payload = obj[i][4];
+delete obj[i][4];
+delete obj[i]['contains'];
+
+}
+
+buildHtmlTable(obj, "#excelDataTable2");
+
+}		
+		
+function alerts(valores) {
+
+var alertas = [];//Variable para guardar los datos que no cumplan los parametros de alerta
+tabla = "#excelDataTable3"
+
+    for (var i = 0; i < valores.length; i++) {
+
+
+			var stoptimeload = (valores[i]["Stopped_Time_loaded"]);
+			var stoptimeempty = (valores[i]["Stopped_Time_empty"]);
+
+			if (stoptimeload > 180 || stoptimeempty > 180) {
+			
+			alertas.push(valores[i]);
+			
+			}
+			
+		}
+
+var obj = alertas;
+//Renonmbramos las columnas
+for (var i = 0; i <  obj.length; i++) {
+
+delete obj[i]['Flow_id'];
+delete obj[i]['Analysis_id'];
+delete obj[i]['X_Load'];
+delete obj[i]['Y_Load'];
+delete obj[i]['Z_Load'];
+delete obj[i]['X_Dump'];
+delete obj[i]['Y_Dump'];
+delete obj[i]['Z_Dump'];
+
+}			
+		
+buildHtmlTable(obj, "#excelDataTable3");
+
+}	
+		
+		
+			//función que devuelve el parametro pasado por la url desde el objeto padre
+function getParameter(parameter){
+			
+                  // Obtiene la cadena completa de URL
+                  var url = location.href;
+                  /* Obtiene la posicion donde se encuentra el signo ?, ahi es donde empiezan los parametros */
+                  var index = url.indexOf("?");
+                  /* Obtiene la posicion donde termina el nombre del parametro e inicia el signo = */
+                  index = url.indexOf(parameter,index) + parameter.length;
+                  /* Verifica que efectivamente el valor en la posicion actuales el signo = */
+                  if (url.charAt(index) == "="){
+                  // Obtiene el valor del parametro
+                  var result = url.indexOf("&",index);
+                  if (result == -1){result=url.length;};
+                  // Despliega el valor del parametro
+                  var resultado = url.substring(index + 1,result);
+				  return resultado;
+                  //alert(resultado);
+                  }
+
+            } 
+
+			
+				
+				
+//FUNCIONES PARA MOSTRAR O BORRAR UNA PANTALLA DE BLOQUEO MIENTRAS SE CARGAN LOS DATOS
+function jsRemoveWindowLoad() {
+	// eliminamos el div que bloquea pantalla
+    $("#WindowLoad").remove();
+
+}
+
+function jsShowWindowLoad(mensaje) {
+	//eliminamos si existe un div ya bloqueando
+    jsRemoveWindowLoad();
+   
+    //si no enviamos mensaje se pondra este por defecto
+    if (mensaje === undefined) mensaje = "Procesando la información<br>Espere por favor";
+   
+    //centrar imagen gif
+    height = 20;//El div del titulo, para que se vea mas arriba (H)
+    var ancho = 0;
+    var alto = 0;
+	
+	//obtenemos el ancho y alto de la ventana de nuestro navegador, compatible con todos los navegadores
+    if (window.innerWidth == undefined) ancho = window.screen.width;
+    else ancho = window.innerWidth;
+    if (window.innerHeight == undefined) alto = window.screen.height;
+    else alto = window.innerHeight;
+    
+	//operación necesaria para centrar el div que muestra el mensaje
+    var heightdivsito = alto/2 - parseInt(height)/2;//Se utiliza en el margen superior, para centrar
+	
+   //imagen que aparece mientras nuestro div es mostrado y da apariencia de cargando
+    imgCentro = "<div style='text-align:center;height:" + alto + "px;'><div  style='color:#000;margin-top:" + heightdivsito + "px; font-size:20px;font-weight:bold'>" + mensaje + "</div><img  src='img/load.gif'></div>";
+
+        //creamos el div que bloquea grande------------------------------------------
+        div = document.createElement("div");
+        div.id = "WindowLoad"
+        div.style.width = ancho + "px";
+        div.style.height = alto + "px";
+        $("body").append(div);
+
+        //creamos un input text para que el foco se plasme en este y el usuario no pueda escribir en nada de atras
+        input = document.createElement("input");
+        input.id = "focusInput";
+        input.type = "text"
+
+		//asignamos el div que bloquea
+        $("#WindowLoad").append(input);
+        
+		//asignamos el foco y ocultamos el input text 
+        $("#focusInput").focus();
+        $("#focusInput").hide();
+		
+		//centramos el div del texto
+        $("#WindowLoad").html(imgCentro);
+
+}
+			
+// Builds the HTML Table out of json data from Ivy restful service.
+function buildHtmlTable(valores, tabla) {
+    var columns = addAllColumnHeaders(valores, tabla);
+
+    for (var i = 0; i < valores.length; i++) {
+        var row$ = $('<tr/>');
+        for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+            var cellValue = valores[i][columns[colIndex]];
+
+            if (cellValue == null) {
+                cellValue = "";
+            }
+
+            row$.append($('<td/>').html(cellValue));
+        }
+        $(tabla).append(row$);
+    }
+}
+
+// Adds a header row to the table and returns the set of columns.
+// Need to do union of keys from all records as some records may not contain
+// all records
+function addAllColumnHeaders(valores, tabla) {
+    var columnSet = [];
+    //var headerTr$ = $('<tr>');
+	var headerTr$ = $('<tr>');
+	
+    for (var i = 0; i < valores.length; i++) {
+        var rowHash = valores[i];
+		
+        for (var key in rowHash) {
+            if ($.inArray(key, columnSet) == -1) {
+                columnSet.push(key);
+                headerTr$.append($('<th style="border: 1px solid black; background-color: #6FF2F2;"/>').html(key));
+            }
+        }
+		
+    }
+	var headerTr2$ = $('<thead >');;
+	headerTr2$.append(headerTr$);
+    $(tabla).append(headerTr2$); 
+
+    return columnSet;
+}
+
+//Connection with the hostinger test local database
+
+			$(document).ready(function(){
+			
+			    $(window).resize(function() {  //Funcion para adaptar el tamaño de las tablas a la ventana del navegador
+        var bodyheight = $(this).height();
+        $("#Data").height(bodyheight*0.8);
+		$("#hourly").height(bodyheight*0.8);
+		$("#alerts").height(bodyheight*0.8);
+    }).resize();
+			
+
+			
+			
+			jsShowWindowLoad(''); //Mostramos al usuario una pantalla de bloqueo mientras se cargan los datos
+			var url="generarJSON.php";
+
+			$.getJSON(url,function(clientes){
+			
+            //valores = clientes;
+			//var caca = JSON.stringify(clientes)
+			//alert(caca);
+			
+
+//Funcion para cambiar el nombre de las cabcera			
+var obj = clientes;
+
+for (var i = 0; i <  obj.length; i++) {
+
+obj[i].Flow_id = obj[i].flow_id;
+delete obj[i].flow_id;
+obj[i].Analysis_id = obj[i].analysis_id;
+delete obj[i].analysis_id;
+obj[i].Origin = obj[i].origin;
+delete obj[i].origin;
+obj[i].Destination = obj[i].destination;
+delete obj[i].destination;
+obj[i].Dumper = obj[i].sn;
+delete obj[i].sn;
+obj[i].Loader = obj[i].loader;
+delete obj[i].loader;
+obj[i].X_Load = obj[i].x_loadcoord;
+delete obj[i].x_loadcoord;
+obj[i].Y_Load = obj[i].y_loadcoord;
+delete obj[i].y_loadcoord;
+obj[i].Z_Load = obj[i].z_loadcoord;
+delete obj[i].z_loadcoord;
+obj[i].X_Dump = obj[i].x_dumpcoord;
+delete obj[i].x_dumpcoord;
+obj[i].Y_Dump = obj[i].y_dumpcoord;
+delete obj[i].y_dumpcoord;
+obj[i].Z_Dump = obj[i].z_dumpcoord;
+delete obj[i].z_dumpcoord;
+obj[i].Date = obj[i].time;
+delete obj[i].time;
+obj[i].Payload = obj[i].payload_truck;
+delete obj[i].payload_truck;
+delete obj[i].time;
+obj[i].Cycle_time = obj[i].cycle_time;
+delete obj[i].cycle_time;
+obj[i].Travel_Time_loaded = obj[i].Travel_time_loaded;
+delete obj[i].Travel_time_loaded;
+obj[i].Stopped_Time_loaded = obj[i].Stopped_time_loaded;
+delete obj[i].Stopped_time_loaded;
+obj[i].Load_Time = obj[i].Load_time;
+delete obj[i].Load_time;
+obj[i].Travel_Time_empty = obj[i].Travel_time_empty;
+delete obj[i].Travel_time_empty;
+obj[i].Stopped_Time_empty = obj[i].Stopped_time_empty;
+delete obj[i].Stopped_time_empty;
+
+
+}
+
+
+valores = obj;
+	
+            buildHtmlTable(valores, "#excelDataTable");
+			jsRemoveWindowLoad();//Quitamos la pantalla de espera
+
+			});
+
+			});
+
+ //Funcion para exportar la tabla a PDF
+ function createpdf(tabla) {
+
+ 
+ if (tabla=="#excelDataTable") {  //Tabla de complete data
+ 
+    var doc = new jsPDF('landscape', 'mm', 'a3');
+    doc.text("COMPLETE DATA", 170, 20);
+    var res = doc.autoTableHtmlToJson(document.getElementById("excelDataTable"));
+    doc.autoTable(res.columns, res.data, {
+		margin: {horizontal: 5, top: 10},
+		startY: 30,
+	styles: {
+	pageBreak: 'auto', 
+	theme: 'grid',
+	cellPadding: 2,
+    fontSize: 8,
+	overflow: 'linebreak',
+	columnWidth: 'auto',
+	rowHeight: 4,
+	halign: 'center', // left, center, right
+	valign: 'middle',
+	},
+	columnStyles: {
+        Flow_id: {columnWidth: 'wrap'}
+    },
+
+	});
+	doc.save('Complete_Data.pdf');
+	
+	}
+	
+	 if (tabla=="#excelDataTable2") {          //Tabla de hourly production
+ 
+    var doc = new jsPDF('landscape', 'mm', 'a4');
+    doc.text("HOURLY PRODUCTION DATA", 110, 20);
+    var res = doc.autoTableHtmlToJson(document.getElementById("excelDataTable2"));
+    doc.autoTable(res.columns, res.data, {
+		margin: {horizontal: 5, top: 10},
+		startY: 35,
+	styles: {
+	pageBreak: 'auto', 
+	theme: 'grid',
+	cellPadding: 2,
+    fontSize: 8,
+	overflow: 'linebreak',
+	columnWidth: 'auto',
+	rowHeight: 5,
+	halign: 'center', // left, center, right
+	valign: 'middle',
+	},
+	columnStyles: {
+        Flow_id: {columnWidth: 'wrap'}
+    },
+
+	});
+	doc.save('Hourly_Data.pdf');
+	
+	}
+	
+	if (tabla=="#excelDataTable3") {          //Tabla de hourly production
+ 
+    var doc = new jsPDF('landscape', 'mm', 'a4');
+    doc.text("ALERTS DATA", 130, 20);
+    var res = doc.autoTableHtmlToJson(document.getElementById("excelDataTable3"));
+    doc.autoTable(res.columns, res.data, {
+		margin: {horizontal: 5, top: 10},
+		startY: 35,
+	styles: {
+	pageBreak: 'auto', 
+	theme: 'grid',
+	cellPadding: 2,
+    fontSize: 8,
+	overflow: 'linebreak',
+	columnWidth: 'auto',
+	rowHeight: 4,
+	halign: 'center', // left, center, right
+	valign: 'middle',
+	},
+	columnStyles: {
+        Flow_id: {columnWidth: 'wrap'}
+    },
+
+	});
+	doc.save('Hourly_Data.pdf');
+	
+	}
+
+        }	
+			
+		//Llamada a los metodos del drowdown para exportar los datos
+
+        jQuery("#action1").click(function(e) {  //Funcion que exporta la tabla a excel
+//Distinguimos la tabla que hay que exportar dependiendo de la pestaña activa
+		if ( $('#menu1').hasClass('active')==true) {   //Pestaña de data
+		
+		
+			        // parse the HTML table element having an id=excelDataTable
+            var dataSource = shield.DataSource.create({
+                data: "#excelDataTable",
+                schema: {
+                    type: "table",
+                    fields: {
+                        Flow_id: { type: Number },
+                        Analysis_id: { type: Number },
+                        Origin: { type: String },
+                        Destination: { type: String },
+						Dumper: { type: String },
+                        Loader: { type: String },
+						X_Load: { type: Number },
+						Y_Load: { type: Number },
+						Z_Load: { type: Number },
+						X_Dump: { type: Number },
+						Y_Dump: { type: Number },
+						Z_Dump: { type: Number },
+						Date: { type: String },
+						Payload: { type: Number },
+						Cycle_time: { type: Number },
+						Travel_Time_loaded: { type: Number },
+						Stopped_Time_loaded: { type: Number },
+						Load_Time: { type: Number },
+						Travel_Time_empty: { type: Number },
+						Stopped_Time_empty: { type: Number },
+						
+						
+                    }
+                }
+            });
+
+            // when parsing is done, export the data to Excel
+            dataSource.read().then(function (data) {
+                new shield.exp.OOXMLWorkbook({
+                    author: "Bergerat",
+                    worksheets: [
+                        {
+                            name: "Complete Data",
+                            rows: [
+                                {
+                                    cells: [
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Flow id"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Analysis id"
+                                        },
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Origin"
+                                        },
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Destination"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Dumper"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Loader"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "X Load"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Y Load"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Z Load"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "X Dump"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Y Dump"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Z Dump"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Date"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Payload"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "CycleTime"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Travel Time loaded"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Stopped Time loaded"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Load Time"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Travel Time empty"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Stopped Time empty"
+                                        },
+                                    ]
+                                }
+                            ].concat($.map(data, function(item) {
+                                return {
+                                    cells: [
+									    { type: Number, value: item.Flow_id },
+										{ type: Number, value: item.Analysis_id },
+                                        { type: String, value: item.Origin },
+                                        { type: String, value: item.Destination },
+										{ type: String, value: item.Dumper },
+                                        { type: String, value: item.Loader },
+										{ type: Number, value: item.X_Load },
+										{ type: Number, value: item.Y_Load },
+										{ type: Number, value: item.Z_Load },
+										{ type: Number, value: item.X_Dump },
+										{ type: Number, value: item.Y_Dump },
+										{ type: Number, value: item.Z_Dump },
+										{ type: String, value: item.Date },
+										{ type: Number, value: item.Payload },
+										{ type: Number, value: item.Cycle_time },
+										{ type: Number, value: item.Travel_Time_loaded },
+										{ type: Number, value: item.Stopped_Time_loaded },
+										{ type: Number, value: item.Load_Time },
+										{ type: Number, value: item.Travel_Time_empty },
+										{ type: Number, value: item.Stopped_Time_empty },
+                                    ]
+                                };
+                            }))
+                        }
+                    ]
+                }).saveAs({
+                    fileName: "Complete_Data"
+                });
+            });
+		
+		
+		
+		}
+		
+		if ( $('#menu2').hasClass('active')==true) {   //Pestaña de hourly
+	
+	        // parse the HTML table element having an id=excelDataTable
+            var dataSource = shield.DataSource.create({
+                data: "#excelDataTable2",
+                schema: {
+                    type: "table",
+                    fields: {
+					    Time: { type: String },
+                        Origin: { type: String },
+                        Destination: { type: String },
+						CycleTime: { type: Number },
+						Payload: { type: Number },
+						
+                    }
+                }
+            });
+
+            // when parsing is done, export the data to Excel
+            dataSource.read().then(function (data) {
+                new shield.exp.OOXMLWorkbook({
+                    author: "Bergerat",
+                    worksheets: [
+                        {
+                            name: "Hourly Data",
+                            rows: [
+                                {
+                                    cells: [
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Time"
+                                        },
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Origin"
+                                        },
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Destination"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "CycleTime"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Payload"
+                                        },
+                                    ]
+                                }
+                            ].concat($.map(data, function(item) {
+                                return {
+                                    cells: [
+									    { type: String, value: item.Time },
+                                        { type: String, value: item.Origin },
+                                        { type: String, value: item.Destination },
+										{ type: Number, value: item.CycleTime },
+										{ type: Number, value: item.Payload }
+                                    ]
+                                };
+                            }))
+                        }
+                    ]
+                }).saveAs({
+                    fileName: "Hourly_Data"
+                });
+            }); 
+			
+			}
+	
+	
+			if ( $('#menu3').hasClass('active')==true) {  //Pestaña de alerts
+		
+		
+				
+			        // parse the HTML table element having an id=excelDataTable
+            var dataSource = shield.DataSource.create({
+                data: "#excelDataTable3",
+                schema: {
+                    type: "table",
+                    fields: {
+                        Flow_id: { type: Number },
+                        Analysis_id: { type: Number },
+                        Origin: { type: String },
+                        Destination: { type: String },
+						Dumper: { type: String },
+                        Loader: { type: String },
+						X_Load: { type: Number },
+						Y_Load: { type: Number },
+						Z_Load: { type: Number },
+						X_Dump: { type: Number },
+						Y_Dump: { type: Number },
+						Z_Dump: { type: Number },
+						Date: { type: String },
+						Payload: { type: Number },
+						Cycle_time: { type: Number },
+						Travel_Time_loaded: { type: Number },
+						Stopped_Time_loaded: { type: Number },
+						Load_Time: { type: Number },
+						Travel_Time_empty: { type: Number },
+						Stopped_Time_empty: { type: Number },
+						
+						
+                    }
+                }
+            });
+
+            // when parsing is done, export the data to Excel
+            dataSource.read().then(function (data) {
+                new shield.exp.OOXMLWorkbook({
+                    author: "Bergerat",
+                    worksheets: [
+                        {
+                            name: "Alert Data",
+                            rows: [
+                                {
+                                    cells: [
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Origin"
+                                        },
+                                        {
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Destination"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Dumper"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Loader"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Date"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Payload"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "CycleTime"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Travel Time loaded"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Stopped Time loaded"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Load Time"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Travel Time empty"
+                                        },
+										{
+                                            style: {
+                                                bold: true
+                                            },
+                                            type: String,
+                                            value: "Stopped Time empty"
+                                        },
+                                    ]
+                                }
+                            ].concat($.map(data, function(item) {
+                                return {
+                                    cells: [
+                                        { type: String, value: item.Origin },
+                                        { type: String, value: item.Destination },
+										{ type: String, value: item.Dumper },
+                                        { type: String, value: item.Loader },
+										{ type: String, value: item.Date },
+										{ type: Number, value: item.Payload },
+										{ type: Number, value: item.Cycle_time },
+										{ type: Number, value: item.Travel_Time_loaded },
+										{ type: Number, value: item.Stopped_Time_loaded },
+										{ type: Number, value: item.Load_Time },
+										{ type: Number, value: item.Travel_Time_empty },
+										{ type: Number, value: item.Stopped_Time_empty },
+                                    ]
+                                };
+                            }))
+                        }
+                    ]
+                }).saveAs({
+                    fileName: "Alert_Data"
+                });
+            });
+		
+		
+		}
+	
+
+        });
+
+        jQuery("#action2").click(function(e) {
+
+          createpdf(tabla);
+
+        });
+
+		
+		$("#Data").height($(document).height()*0.8);
+		$("#hourly").height($(document).height()*0.8);
+		$("#alerts").height($(document).height()*0.8);
+		//Funcion para cambiar el alto de la tabla cada vez que la ventana cambia de tamaño
+		$(document).resize(function() {
+		
+		$("#Data").height($(document).height()*0.8);
+		$("#hourly").height($(document).height()*0.8);
+		$("#alerts").height($(document).height()*0.8);
+		
+        });
+		
+
+    </script>
+
+
+</body>
+</html>
